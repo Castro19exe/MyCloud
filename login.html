@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <script type="module" src="/src/js/login.js"></script>
+  <style>
+        * {
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to right, #4e54c8, #8f94fb);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        }
+
+        #login-form {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 360px;
+        }
+
+        #login-form input {
+        padding: 12px;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        }
+
+        #login-form button {
+        padding: 12px;
+        background-color: #4e54c8;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        }
+
+        #login-form button:hover {
+        background-color: #3e42a5;
+        }
+    </style>
+</head>
+<body>
+    <form id="login-form">
+        <input type="email" placeholder="Email" id="login-email" required />
+        <input type="password" placeholder="Senha" id="login-password" required />
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>

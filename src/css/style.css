@@ -1,0 +1,234 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+}
+
+/* Layout geral */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Navbar vertical */
+nav {
+  width: 240px;
+  background-color: #1a73e8;
+  color: white;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Seção conta */
+.account {
+  padding: 0 24px 24px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  position: relative;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-image: url("https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg");
+  background-size: cover;
+  background-position: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 16px;
+  flex-grow: 1;
+}
+
+/* Setinha dropdown */
+.arrow {
+  border: solid white;
+  border-width: 0 2.5px 2.5px 0;
+  display: inline-block;
+  padding: 4px;
+  margin-left: 8px;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+.arrow.open {
+  transform: rotate(-135deg);
+}
+
+/* Menu dropdown */
+.account-menu {
+  position: absolute;
+  top: 60px;
+  left: 24px;
+  width: 190px;
+  background: white;
+  color: #202124;
+  /* border-radius: 8px; */
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+  display: none;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.account-menu.open {
+  display: flex;
+}
+
+.account-menu a {
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #202124;
+  font-weight: 600;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+}
+.account-menu a:last-child {
+  border-bottom: none;
+}
+.account-menu a:hover {
+  background-color: #f1f3f4;
+}
+
+#logout-btn {
+  display: none;
+}
+
+nav h2 {
+  margin: 20px 0 30px 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-left: 4px solid transparent;
+}
+nav a:hover, nav a.active {
+  background-color: rgba(255,255,255,0.2);
+  border-left: 4px solid #fff;
+}
+
+/* Main content */
+main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+main h1 {
+  margin-bottom: 0px;
+  color: #202124;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.upload-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-section input[type="file"] {
+  display: none;
+}
+
+.custom-file-label {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-label:hover {
+  background-color: #e8e8e8;
+}
+
+#upload-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+#upload-btn:hover {
+  background-color: #45a049;
+}
+
+/* Tabela de ficheiros */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background: #f1f3f4;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr:hover {
+  background-color: #e8f0fe;
+}
+
+/* Ícones simples */
+.file-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.icon-doc {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/document--v1.png') no-repeat center center;
+  background-size: contain;
+}
+.icon-img {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/image.png') no-repeat center center;
+  background-size: contain;
+}
+.icon-pdf {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/pdf.png') no-repeat center center;
+  background-size: contain;
+}

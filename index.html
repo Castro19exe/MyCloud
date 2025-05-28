@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Cloud</title>
+    <link rel="stylesheet" href="src/css/style.css">
+    <script type="module" src="src/js/index.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="account" id="account-section">
+            <div class="account-info" id="account-info">
+                <div class="avatar"></div>
+                <div class="username">Conta</div>
+                <i class="arrow" id="account-arrow"></i>
+            </div>
+            <div class="account-menu" id="account-menu">
+                <a href="login.html" id="login-btn">Iniciar Sessão</a>
+                <a href="register.html" id="register-btn">Criar Conta</a>
+                <a href="#" id="logout-btn">Terminar Sessão</a>
+            </div>
+            </div>
+            <h2>My Cloud</h2>
+            <a href="#" class="active">Meus Ficheiros</a>
+            <a href="#">Compartilhados</a>
+            <a href="#">Recentes</a>
+            <a href="#">Lixeira</a>
+        </nav>
+        <main>
+            <div class="header-section">
+                <h1>Meus Ficheiros</h1>
+                <div class="upload-section">
+                    <label for="fileInput" class="custom-file-label">Escolher ficheiro</label>
+                    <input type="file" id="fileInput" />
+                    <button id="upload-btn">Upload</button>
+                </div>
+            </div>
+            <table>
+            <thead>
+                <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Tamanho</th>
+                <th>Modificado</th>
+                </tr>
+            </thead>
+            <tbody id="file-list">
+                <!-- Ficheiros aparecem aqui via JS -->
+            </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        // Dados de ficheiros exemplo
+        const files = [
+            {name: 'Relatório.docx', type: 'Documento', size: '24 KB', modified: '2025-05-20', icon: 'icon-doc'},
+            {name: 'Foto-Viagem.jpg', type: 'Imagem', size: '2.1 MB', modified: '2025-05-22', icon: 'icon-img'},
+            {name: 'Projeto.pdf', type: 'PDF', size: '1.3 MB', modified: '2025-05-18', icon: 'icon-pdf'},
+            {name: 'Notas.txt', type: 'Documento', size: '8 KB', modified: '2025-05-21', icon: 'icon-doc'},
+            {name: 'Logo.png', type: 'Imagem', size: '512 KB', modified: '2025-05-23', icon: 'icon-img'}
+        ];
+
+        const tbody = document.getElementById('file-list');
+        files.forEach(file => {
+            const tr = document.createElement('tr');
+
+            const tdName = document.createElement('td');
+            tdName.innerHTML = `<span class="file-icon ${file.icon}"></span>${file.name}`;
+
+            const tdType = document.createElement('td');
+            tdType.textContent = file.type;
+
+            const tdSize = document.createElement('td');
+            tdSize.textContent = file.size;
+
+            const tdModified = document.createElement('td');
+            tdModified.textContent = file.modified;
+
+            tr.appendChild(tdName);
+            tr.appendChild(tdType);
+            tr.appendChild(tdSize);
+            tr.appendChild(tdModified);
+
+            tbody.appendChild(tr);
+        });
+
+        // Dropdown conta
+        const accountInfo = document.getElementById('account-info');
+        const accountMenu = document.getElementById('account-menu');
+        const accountArrow = document.getElementById('account-arrow');
+
+        accountInfo.addEventListener('click', () => {
+            accountMenu.classList.toggle('open');
+            accountArrow.classList.toggle('open');
+        });
+
+        // Fechar dropdown clicando fora
+        document.addEventListener('click', (e) => {
+            if (!accountInfo.contains(e.target) && !accountMenu.contains(e.target)) {
+            accountMenu.classList.remove('open');
+            accountArrow.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
