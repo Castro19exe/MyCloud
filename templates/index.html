@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Cloud</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="account" id="account-section">
+            <div class="account-info" id="account-info">
+                <div class="avatar"></div>
+                {% if current_user.is_authenticated %}
+                    {{ current_user.email }}
+                {% else %}
+                    Conta
+                {% endif %}
+                <i class="arrow" id="account-arrow"></i>
+            </div>
+            <div class="account-menu" id="account-menu">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout_page') }}" id="logout-btn">Terminar Sessão</a>
+                {% else %}
+                    <a href="{{ url_for('login_page') }}" id="login-btn">Iniciar Sessão</a>
+                    <a href="{{ url_for('register_page') }}" id="register-btn">Criar Conta</a>
+                {% endif %}
+            </div>
+            </div>
+            <h2>My Cloud</h2>
+            <a href="#">Compartilhados</a>
+            <a href="#">Recentes</a>
+            <a href="#">Lixeira</a>
+        </nav>
+        <main>
+            <div class="header-section">
+                <h1>Meus Ficheiros</h1>
+                <div class="upload-section">
+                    <label for="fileInput" class="custom-file-label">Escolher ficheiro</label>
+                    <input type="file" id="fileInput" />
+                    <button id="upload-btn">Upload</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Tamanho</th>
+                    <th>Modificado</th>
+                    </tr>
+                </thead>
+                <tbody id="file-list">
+                    {% if files %}
+                        {% for file in files %}
+                        <tr>
+                            <td>
+                                <span class="file-icon {{ file.icon_class }}"></span> {{ file.name }}
+                            </td>
+                            <td>{{ file.type }}</td>
+                            <td>{{ file.size }}</td>
+                            <td>{{ file.modified }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center;">Nenhum ficheiro encontrado.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

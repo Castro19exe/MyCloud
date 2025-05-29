@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #4e54c8, #8f94fb); /* Mesmo gradiente do login */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.register-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px; /* Um pouco mais largo para o título e mensagem */
+    text-align: center;
+}
+
+.register-container h1 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.register-container p {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 16px;
+}
+
+/* Estilo para o container de mensagens */
+#message-container {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    text-align: left;
+    display: none; /* Escondido por defeito */
+    border: 1px solid transparent;
+}
+
+#message-container.success {
+    background-color: #e8f5e9; /* Verde claro */
+    color: #2e7d32; /* Verde escuro */
+    border-color: #a5d6a7;
+    display: block; /* Mostra quando tem a classe success */
+}
+
+#message-container.error {
+    background-color: #ffebee; /* Vermelho claro */
+    color: #c62828; /* Vermelho escuro */
+    border-color: #ef9a9a;
+    display: block; /* Mostra quando tem a classe error */
+}
+
+/* Mude de .register-form para #register-form nestes seletores */
+#register-form input[type="email"],
+#register-form input[type="password"] {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+#register-form input[type="email"]:focus,
+#register-form input[type="password"]:focus {
+  outline: none;
+  border-color: #4e54c8; 
+}
+
+#register-form button { /* E também para o botão, se ele estiver a usar .register-form */
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#register-form button:hover {
+  background: linear-gradient(135deg, #3e42a5, #7c69e1);
+}
+
+#register-form button:active {
+    transform: scale(0.98);
+}
+
+.extra-links {
+    margin-top: 25px;
+    color: #555;
+    font-size: 15px;
+}
+
+.extra-links a {
+    color: #4e54c8; /* Cor primária */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}

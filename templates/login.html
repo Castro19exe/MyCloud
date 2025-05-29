@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - My Cloud</title>
+  <script type="module" src="{{ url_for('static', filename='js/login.js') }}"></script>
+  <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .login-container {
+        background-color: #ffffff;
+            padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .login-container h1 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .login-container p {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 16px;
+    }
+
+    .login-form input[type="email"],
+    .login-form input[type="password"] {
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .login-form input[type="email"]:focus,
+    .login-form input[type="password"]:focus {
+        outline: none;
+        border-color: #6e8efb;
+    }
+
+    .login-form button {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+
+    .login-form button:hover {
+        background: linear-gradient(135deg, #5a78e1, #8f63c7);
+    }
+    
+    .login-form button:active {
+        transform: scale(0.98);
+    }
+
+    .extra-links {
+      margin-top: 25px;
+      color: #555;
+    }
+
+    .extra-links a {
+      color: #6e8efb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .extra-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Para mensagens de erro (opcional, se quiser mostrá-las via JS) */
+    .error-message {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        border: 1px solid #ef9a9a;
+        font-size: 14px;
+        text-align: left;
+    }
+
+  </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Bem-vindo ao My Cloud!</h1>
+        <p>Faça login para aceder ao seus ficheiros.</p>
+        
+        <form id="login-form" class="login-form">
+            <input type="email" placeholder="Email" id="login-email" required />
+            <input type="password" placeholder="Senha" id="login-password" required />
+            <button type="submit">Login</button>
+        </form>
+        <div class="extra-links">
+            Não tem uma conta? <a href="{{ url_for('register_page') }}">Crie uma aqui!</a>
+        </div>
+    </div>
+</body>
+</html>
