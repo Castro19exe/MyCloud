@@ -1,0 +1,329 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f9f9f9;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Navbar vertical */
+nav {
+  width: 240px;
+  background-color: #1a73e8;
+  color: white;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+nav h2 {
+  margin: 20px 0 30px 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-left: 4px solid transparent;
+}
+nav a:hover, nav a.active {
+  background-color: rgba(255,255,255,0.2);
+  border-left: 4px solid #fff;
+}
+
+/* Estilos para os links de navegação principais e seus ícones */
+nav a.nav-link { /* Seleciona os <a> com a classe nav-link dentro da nav */
+    display: flex; /* Alinha o ícone e o texto na horizontal */
+    align-items: center; /* Alinha verticalmente o ícone e o texto */
+    padding: 12px 24px; /* Mesmo padding que você já tinha */
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    border-left: 4px solid transparent; /* Mesmo estilo de borda que você já tinha */
+}
+
+nav a.nav-link:hover, 
+nav a.nav-link.active { /* Se a classe 'active' for usada para o item atual */
+    background-color: rgba(255,255,255,0.2);
+    border-left: 4px solid #fff;
+}
+
+.nav-icon {
+  width: 20px;  /* Tamanho do ícone SVG */
+  height: 20px; /* Tamanho do ícone SVG */
+  margin-right: 12px; /* Espaço entre o ícone e o texto */
+  fill: currentColor; /* Faz com que o SVG herde a cor do texto (branco, neste caso) */
+  flex-shrink: 0; /* Impede que o ícone encolha se o espaço for apertado */
+}
+
+.nav-link span {
+  flex-grow: 1; /* Faz o texto ocupar o espaço restante */
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.account-menu-content {
+  display: none; 
+}
+.account-menu-content.open {
+  display: block; 
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-image: url("https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg");
+  background-size: cover;
+  background-position: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+main h1 {
+  margin-bottom: 0px;
+  color: #202124;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.upload-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-section input[type="file"] {
+  display: none;
+}
+
+.custom-file-label {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-file-label:hover {
+  background-color: #e8e8e8;
+}
+
+#upload-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+#upload-btn:hover {
+  background-color: #45a049;
+}
+
+/* Tabela de ficheiros */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background: #f1f3f4;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr:hover {
+  background-color: #e8f0fe;
+}
+
+/* Ícones simples */
+.file-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.icon-doc {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/document--v1.png') no-repeat center center;
+  background-size: contain;
+}
+.icon-img {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/image.png') no-repeat center center;
+  background-size: contain;
+}
+.icon-pdf {
+  background: url('https://img.icons8.com/ios-filled/50/1a73e8/pdf.png') no-repeat center center;
+  background-size: contain;
+}
+
+
+
+/* Estilos ATUALIZADOS para o Dropdown da Conta - Torna o trigger mais notável */
+
+.account-dropdown {
+    position: relative;
+    display: block; /* Ocupa a largura da nav */
+    padding: 10px 15px; /* Padding interno para toda a secção da conta */
+    border-bottom: 1px solid rgba(255,255,255,0.2); /* Linha separadora mais subtil */
+    margin-bottom: 15px; /* Espaço antes do título "My Cloud" */
+}
+
+.account-trigger {
+    display: flex;
+    align-items: center;
+    padding: 8px 0; /* Padding vertical para o trigger, horizontal vem do pai */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: #fff; /* Garante que o texto e SVGs no trigger são brancos */
+    border-radius: 6px; /* Opcional: leve arredondamento para o trigger em si */
+}
+
+.account-trigger:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fundo subtil no hover */
+}
+
+.account-trigger .avatar {
+    width: 40px;   /* Aumenta o tamanho do avatar */
+    height: 40px;  /* Aumenta o tamanho do avatar */
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.25); /* Um pouco mais visível */
+    margin-right: 12px; /* Mais espaço */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.3); /* Borda subtil no avatar */
+}
+.account-trigger .avatar svg {
+    width: 24px;   /* SVG do avatar maior */
+    height: 24px;  /* SVG do avatar maior */
+    fill: #fff;
+}
+
+.account-username {
+    font-size: 16px;  /* Tamanho da fonte maior */
+    font-weight: 600; /* Mais destacado */
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px; /* Ajuste conforme necessário */
+    color: #fff; /* Garante cor branca */
+}
+
+.arrow-icon {
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Empurra a seta para a direita do username */
+}
+.arrow-icon svg {
+    width: 20px;   /* Seta um pouco maior */
+    height: 20px;  /* Seta um pouco maior */
+    fill: #fff;
+}
+
+.arrow-icon.open {
+    transform: rotate(180deg);
+}
+
+/* O CSS para .account-menu-content e os seus filhos (ul, li, a) permanece o mesmo que antes */
+/* ... (cole aqui o CSS que eu já tinha fornecido para .account-menu-content, ul, li, a) ... */
+/* Por exemplo: */
+.account-menu-content {
+    display: none; 
+    position: absolute;
+    top: calc(100% + 5px); /* Posiciona abaixo do .account-dropdown, com pequeno espaço */
+    right: 15px; /* Alinha à direita, considerando o padding do .account-dropdown */
+    left: 15px; /* Opcional: faz o menu ter a mesma largura do padding, ou use min-width */
+    background-color: #ffffff;
+    min-width: calc(100% - 30px); /* Tenta ocupar a largura do .account-dropdown */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    z-index: 100; 
+    /* margin-top: 8px; Removido, pois 'top' agora inclui o espaço */
+    overflow: hidden; 
+    padding: 8px 0; /* Padding vertical para os itens do menu */
+}
+
+.account-menu-content.open {
+    display: block; 
+}
+
+.account-menu-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.account-menu-content ul li a {
+    display: flex; 
+    align-items: center;
+    padding: 10px 20px; /* Padding dos itens de menu */
+    text-decoration: none;
+    color: #333333;
+    font-size: 15px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap; 
+}
+.account-menu-content ul li a svg { 
+    fill: #555;
+    transition: fill 0.2s ease;
+    margin-right: 10px; /* Adicionado mais espaço para os ícones dos itens de menu */
+    width: 18px; /* Tamanho dos ícones dos itens de menu */
+    height: 18px;
+}
+
+.account-menu-content ul li a:hover {
+    background-color: #f0f0f0;
+    color: #2c3e50;
+}
+.account-menu-content ul li a:hover svg {
+    fill: #2c3e50;
+}

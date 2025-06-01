@@ -1,0 +1,8 @@
+Flask
+python-dotenv
+Flask-Login
+google-cloud-storage
+gunicorn
+Flask-SQLAlchemy  # <--- ADICIONE ESTA LINHA SE NÃO EXISTIR
+psycopg2-binary   # Adicione esta também, se ainda não estiver, para PostgreSQL
+requests          # Você usou 'requests' para o metadata server, adicione se não estiver

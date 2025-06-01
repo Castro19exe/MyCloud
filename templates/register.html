@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Criar Conta - My Cloud</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/register.js') }}"></script>
+</head>
+<body>
+    <div class="register-container">
+        <div class="loading-spinner-overlay" id="loading-spinner-overlay-register" style="display: none;">
+            <div class="spinner"></div>
+            <p>A criar conta...</p>
+        </div>
+
+        <div class="loading-spinner-overlay" id="loading-spinner-overlay-register" style="display: none;">
+            <div class="spinner"></div>
+            <p>A criar conta...</p>
+        </div>
+
+        <h1>Crie a sua conta</h1>
+        <p>É rápido e fácil. Comece a usar o My Cloud hoje!</p>
+        
+        <form id="register-form"> 
+            <input type="email" placeholder="Email" id="register-email" autocomplete="off" required />
+            <input type="password" placeholder="Senha" id="register-password" autocomplete="off" required />
+            <button type="submit">Criar Conta</button>
+        </form>
+        <div class="extra-links">
+            Já tem uma conta? <a href="{{ url_for('login_page') }}">Faça login aqui</a>
+        </div>
+    </div>
+</body>
+</html>

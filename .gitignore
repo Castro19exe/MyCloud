@@ -1,0 +1,49 @@
+# Ambientes Virtuais
+venv/
+env/
+ENV/
+*.venv
+
+# Ficheiros de Cache e Compilados do Python
+__pycache__/
+*.py[cod] # Abrange .pyc, .pyo, .pyd
+*.so
+*.egg-info/
+.Python
+
+# Ficheiros de Configuração Local e Segredos
+.env
+*.json
+airy-bit-460116-k8-1b7b49d458ae.json
+
+# Ficheiros de IDEs e Editores
+.vscode/    # Se usar VS Code e não quiser partilhar as configurações do workspace
+.idea/      # Se usar PyCharm ou outros IDEs da JetBrains
+*.sublime-workspace
+*.sublime-project
+
+# Ficheiros de Sistema Operacional
+.DS_Store   # macOS
+Thumbs.db   # Windows
+ehthumbs.db # Windows
+
+# Logs da Aplicação (se você gerar algum localmente)
+*.log
+logs/
+
+# Bases de Dados SQLite locais (se usar alguma para testes rápidos, o que não é o seu caso principal)
+*.db
+*.sqlite3
+
+# Ficheiros de Construção ou Pacotes (se gerar algum)
+dist/
+build/
+*.egg
+
+# Cobertura de Testes (se adicionar testes)
+.coverage
+coverage.xml
+htmlcov/
+
+# Ficheiros temporários do Docker (se construir localmente)
+# O .dockerignore já trata disto para a construção da imagem, mas pode adicionar aqui por redundância.

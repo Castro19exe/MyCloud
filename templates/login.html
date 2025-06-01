@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - My Cloud</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/login.js') }}"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="loading-spinner-overlay" id="loading-spinner-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>A autenticar...</p>
+        </div>
+
+        <h1>Bem-vindo de volta!</h1>
+        <p>Faça login para aceder ao seu My Cloud.</p>
+        
+        <form id="login-form" class="login-form">
+            <input type="email" placeholder="Email" id="login-email" required />
+            <input type="password" placeholder="Senha" id="login-password" required />
+            <button type="submit">Login</button>
+        </form>
+        <div class="extra-links">
+            Não tem uma conta? <a href="{{ url_for('register_page') }}">Crie uma aqui</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Cloud</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="account-dropdown" id="account-section">
+                <div class="account-trigger" id="account-info">
+                    <div class="avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="account-username">
+                        {% if current_user.is_authenticated %}
+                            {{ current_user.email.split('@')[0] }} {% else %}
+                            Conta
+                        {% endif %}
+                    </div>
+                    <i class="arrow-icon" id="account-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </i>
+                </div>
+                <div class="account-menu-content" id="account-menu">
+                    <ul>
+                        {% if current_user.is_authenticated %}
+                        <li>
+                            <a href="{{ url_for('logout_page') }}" id="logout-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>
+                                Terminar Sessão
+                            </a>
+                        </li>
+                        {% else %}
+                        <li><a href="{{ url_for('login_page') }}" id="login-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            Iniciar Sessão
+                        </a></li>
+                        <li><a href="{{ url_for('register_page') }}" id="register-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" /></svg>
+                            Criar Conta
+                        </a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <h2>My Cloud</h2> 
+            <a href="#" class="nav-link active">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M3.53 2.24A2.5 2.5 0 001.75 4.555v1.773c0 .72.51 1.341 1.214 1.525V13.5a2.5 2.5 0 002.5 2.5h9a2.5 2.5 0 002.5-2.5V7.853c.704-.184 1.214-.805 1.214-1.525V4.555a2.5 2.5 0 00-1.78-2.315L10.586.22a2.5 2.5 0 00-1.172 0L3.53 2.24zM2.25 4.555A1.75 1.75 0 013.71 3.07L10 1.114l6.29 1.957a1.75 1.75 0 011.46 1.48v1.773A1.75 1.75 0 0116.286 8H3.714A1.75 1.75 0 012.25 6.328V4.555zM16 13.5a1.75 1.75 0 01-1.75 1.75h-9A1.75 1.75 0 013.5 13.5v-4h13v4z"/>
+                </svg>
+                <span>Meu Disco</span>
+            </a>
+            <a href="#" class="nav-link">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+                <span>Compartilhados</span>
+            </a>
+            <a href="#" class="nav-link">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+                <span>Recentes</span>
+            </a>
+            <a href="#" class="nav-link">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Lixeira</span>
+            </a>
+        </nav>
+        <main>
+            <div class="header-section">
+                <h1>Meu Disco</h1>
+                <div class="upload-section">
+                    <label for="fileInput" class="custom-file-label">Escolher ficheiro</label>
+                    <input type="file" id="fileInput" />
+                    <button id="upload-btn">Upload</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Tamanho</th>
+                        <th>Modificado</th>
+                        <th>Ações</th> </tr>
+                </thead>
+                <tbody id="file-list">
+                    {% if files %}
+                        {% for file in files %}
+                        <tr>
+                            <td>
+                                <span class="file-icon {{ file.icon_class }}"></span> {{ file.name }}
+                            </td>
+                            <td>{{ file.type }}</td>
+                            <td>{{ file.size }}</td>
+                            <td>{{ file.modified }}</td>
+                            <td>
+                                <a href="{{ url_for('download_file', filename=file.name) }}" class="action-link download-link">Download</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Nenhum ficheiro encontrado.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git/
+.gitignore
+.vscode/
+*.db
+*.sqlite3
+*.log
+*.DS_Store
+.env
+airy-bit-460116-k8-1b7b49d458ae.json
