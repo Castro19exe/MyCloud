@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from google.cloud import storage
 import uuid
 from sqlalchemy.sql import text
-from datetime import datetime
 from datetime import timedelta
 
 load_dotenv()
@@ -53,6 +52,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+TRASH_PREFIX = "trash/"
+
+@app.context_processor
+def inject_global_vars():
+    return dict(TRASH_PREFIX=TRASH_PREFIX)
+
 # Outras variáveis que você usa e obtém de os.environ (como GCP_PROJECT_ID) devem ser obtidas da mesma forma.
 GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
 if not GCP_PROJECT_ID and IS_RUNNING_ON_CLOUD_RUN: # Pode ser necessário no Cloud Run para o storage client
@@ -79,7 +84,7 @@ login_manager.login_message = "Por favor, faça login para aceder a esta página
 login_manager.login_message_category = "info" # Categoria da mensagem flash (opcional)
 
 # --- Modelos do Banco de Dados ---
-class User(db.Model, UserMixin): # UserMixin adiciona funcionalidades do Flask-Login
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
@@ -94,12 +99,10 @@ class User(db.Model, UserMixin): # UserMixin adiciona funcionalidades do Flask-L
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Callback do Flask-Login para carregar um utilizador a partir do ID da sessão
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Função auxiliar para formatar o tamanho do ficheiro (pode colocar no final do ficheiro ou num ficheiro de utils)
 def format_file_size(size_bytes):
     if size_bytes is None:
         return "N/A"
@@ -113,7 +116,6 @@ def format_file_size(size_bytes):
     s = "%.2f" % size_bytes
     return "%s %s" % (s.rstrip('0').rstrip('.'), size_name[i])
 
-# Função auxiliar para tentar obter um tipo de ficheiro genérico (pode expandir)
 def get_file_type_from_name(filename):
     if '.' not in filename:
         return "Desconhecido"
@@ -133,7 +135,7 @@ def get_file_type_from_name(filename):
     elif ext in ['zip', 'rar', 'tar', 'gz']:
         return "Comprimido"
     else:
-        return ext.upper() # Ou "Ficheiro"
+        return ext.upper()
 
 # --- Rotas ---
 @app.route('/')
@@ -147,17 +149,19 @@ def home():
             blobs = storage_client.list_blobs(current_user.gcs_bucket_name)
             
             for blob in blobs:
-                updated_date = blob.updated.strftime('%H:%M %d-%m-%Y') if blob.updated else "N/A"
-                file_type = get_file_type_from_name(blob.name) # Já tínhamos isto
+                if blob.name.startswith(TRASH_PREFIX):
+                    continue
 
-                # Determinar a classe do ícone com base no tipo de ficheiro
-                icon_class = 'icon-file-alt' # Ícone padrão (Font Awesome example)
+                updated_date = blob.updated.strftime('%H:%M %d-%m-%Y') if blob.updated else "N/A"
+                file_type = get_file_type_from_name(blob.name)
+
+                icon_class = 'icon-file-alt'
                 if file_type == "PDF":
-                    icon_class = 'icon-pdf' # Exemplo: sua classe CSS para PDF
+                    icon_class = 'icon-pdf'
                 elif file_type == "Imagem":
-                    icon_class = 'icon-img' # Exemplo: sua classe CSS para Imagem
+                    icon_class = 'icon-img'
                 elif file_type in ["Documento Word", "Texto"]:
-                    icon_class = 'icon-doc' # Exemplo: sua classe CSS para Documento
+                    icon_class = 'icon-doc'
                 # Adicione mais elif para outros tipos e ícones específicos
                 # elif file_type == "Folha de Cálculo":
                 #     icon_class = 'icon-excel' # Exemplo
@@ -169,14 +173,20 @@ def home():
                     'type': file_type,
                     'size': format_file_size(blob.size),
                     'modified': updated_date,
-                    'icon_class': icon_class  # NOVA CHAVE ADICIONADA
+                    'icon_class': icon_class
                 })
             print(f"Ficheiros encontrados para {current_user.email}: {len(files_data)}")
         except Exception as e:
             print(f"Erro ao listar ficheiros do bucket {current_user.gcs_bucket_name}: {e}")
-            # flash(f"Não foi possível carregar os ficheiros: {e}", "danger")
     
     return render_template('index.html', files=files_data)
+
+
+@app.route('/compartilhados')
+@login_required
+def compartilhados_page():
+    return render_template('compartilhados.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -205,6 +215,7 @@ def login_page():
         return render_template('login.html')
 
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
@@ -280,6 +291,7 @@ def register_page():
 
     return render_template('register.html')
 
+
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
@@ -317,6 +329,7 @@ def upload_file():
             return jsonify({"error": "Utilizador não tem um bucket GCS configurado."}), 400
         return jsonify({"error": "Erro desconhecido no upload."}), 500
     
+    
 @app.route('/download/<path:filename>')
 @login_required
 def download_file(filename):
@@ -353,6 +366,101 @@ def download_file(filename):
         # flash("Erro ao tentar descarregar o ficheiro. Tente novamente.", "danger")
         return "Erro ao processar o pedido de download.", 500
     
+# --- Rotas da Lixeira ---
+@app.route('/lixeira')
+@login_required
+def lixeira_page():
+    trashed_files_data = []
+    if current_user.gcs_bucket_name:
+        try:
+            storage_client = storage.Client(project=GCP_PROJECT_ID)
+            blobs_in_trash = storage_client.list_blobs(current_user.gcs_bucket_name, prefix=TRASH_PREFIX)
+            for blob in blobs_in_trash:
+                if blob.name == TRASH_PREFIX and (blob.size is None or blob.size == 0):
+                    continue
+                updated_date = blob.updated.strftime('%H:%M %d-%m-%Y') if blob.updated else "N/A"
+                original_filename = blob.name.replace(TRASH_PREFIX, '', 1)
+                file_type = get_file_type_from_name(original_filename)
+                icon_class = 'icon-file-alt'
+                if file_type == "PDF": icon_class = 'icon-pdf'
+                elif file_type == "Imagem": icon_class = 'icon-img'
+                elif file_type in ["Documento Word", "Texto"]: icon_class = 'icon-doc'
+                trashed_files_data.append({
+                    'name': blob.name, # Nome completo com prefixo para referência
+                    'original_name_display': original_filename, # Nome para exibir
+                    'type': file_type,
+                    'size': format_file_size(blob.size),
+                    'modified': updated_date,
+                    'icon_class': icon_class
+                })
+        except Exception as e:
+            print(f"Erro ao listar ficheiros da lixeira: {e}")
+            flash(f"Não foi possível carregar a lixeira: {str(e)}", "danger")
+    return render_template('lixeira.html', trashed_files=trashed_files_data)
+
+
+@app.route('/move_to_trash/<path:filename>', methods=['POST'])
+@login_required
+def move_to_trash(filename):
+    if not current_user.gcs_bucket_name:
+        flash("Utilizador não tem um bucket configurado.", "danger")
+        return redirect(url_for('home'))
+    try:
+        storage_client = storage.Client(project=GCP_PROJECT_ID)
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+        source_blob = bucket.blob(filename)
+
+        if not source_blob.exists():
+            flash(f"O ficheiro '{filename}' não foi encontrado.", "warning")
+            return redirect(url_for('home'))
+
+        destination_blob_name = TRASH_PREFIX + filename.lstrip('/')
+        
+        # Lógica para evitar sobrescrever na lixeira (adiciona sufixo numérico)
+        counter = 1
+        temp_dest_name = destination_blob_name
+        original_name_part_for_rename, ext_part_for_rename = os.path.splitext(filename.lstrip('/'))
+
+        while bucket.blob(temp_dest_name).exists():
+            temp_dest_name = f"{TRASH_PREFIX}{original_name_part_for_rename}({counter}){ext_part_for_rename}"
+            counter += 1
+        destination_blob_name = temp_dest_name
+        
+        new_blob = bucket.copy_blob(source_blob, bucket, destination_blob_name)
+        if new_blob.exists():
+            source_blob.delete()
+            flash(f"Ficheiro '{filename}' movido para a lixeira.", "success")
+        else:
+            flash(f"Falha ao mover o ficheiro '{filename}' para a lixeira.", "danger")
+    except Exception as e:
+        print(f"Erro ao mover ficheiro '{filename}' para a lixeira: {e}")
+        flash(f"Erro ao mover ficheiro para a lixeira: {str(e)}", "danger")
+    return redirect(url_for('home'))
+
+
+@app.route('/delete_permanently_from_trash/<path:full_trash_filename>', methods=['POST'])
+@login_required
+def delete_permanently_from_trash_route(full_trash_filename): # Nome da função alterado
+    if not current_user.gcs_bucket_name:
+        flash("Utilizador não tem um bucket configurado.", "danger")
+        return redirect(url_for('lixeira_page'))
+    if not full_trash_filename.startswith(TRASH_PREFIX):
+        flash("Operação inválida: O ficheiro não está na lixeira.", "danger")
+        return redirect(url_for('lixeira_page'))
+    try:
+        storage_client = storage.Client(project=GCP_PROJECT_ID)
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+        blob = bucket.blob(full_trash_filename)
+        if blob.exists():
+            blob.delete()
+            display_name = full_trash_filename.replace(TRASH_PREFIX, '', 1)
+            flash(f"Ficheiro '{display_name}' apagado permanentemente.", "success")
+        else:
+            flash(f"Ficheiro não encontrado na lixeira para apagar.", "warning")
+    except Exception as e:
+        print(f"Erro ao apagar permanentemente '{full_trash_filename}': {e}")
+        flash(f"Erro ao apagar permanentemente o ficheiro: {str(e)}", "danger")
+    return redirect(url_for('lixeira_page'))
 
 # ------------------------------ UTILIZAÇÃO APENAS EM DEVELOPMENT ------------------------------ #
 
@@ -372,123 +480,6 @@ def list_users_debug():
         return output
     except Exception as e:
         return f"Erro ao aceder à base de dados: {str(e)}"
-
-
-@app.route('/_admin_tools/reset_all_user_data_and_buckets_for_real_no_kidding', methods=['GET', 'POST'])
-@login_required # Proteja minimamente, embora para um reset total, talvez queira uma confirmação extra
-def admin_reset_all_data():
-    # Segurança extra: só funciona em modo debug e requer um parâmetro específico
-    # Numa app real, isto teria uma autenticação de admin muito mais robusta.
-    if not app.debug:
-        return "Acesso negado. Esta funcionalidade só está disponível em modo de depuração.", 403
-    
-    if request.method == 'POST':
-        # Para uma confirmação muito explícita, poderia pedir um parâmetro no POST
-        # if request.form.get('confirm_reset') != "SIM_EU_QUERO_APAGAR_TUDO":
-        #     return "Confirmação de reset inválida.", 400
-
-        deleted_buckets_info = []
-        errors_info = []
-
-        try:
-            project_id = os.environ.get('GCP_PROJECT_ID', 'airy-bit-460116-k8') # Confirme seu project_id
-            storage_client = storage.Client(project=project_id)
-            
-            # 1. Obter todos os utilizadores para saber quais buckets apagar
-            users_to_delete = User.query.all()
-            
-            for user in users_to_delete:
-                if user.gcs_bucket_name:
-                    try:
-                        bucket = storage_client.bucket(user.gcs_bucket_name)
-                        if bucket.exists():
-                            # Apagar todos os objetos dentro do bucket primeiro
-                            # Se o bucket tiver muitos objetos, isto pode demorar e pode ser melhor usar delete_blobs em lote
-                            blobs_to_delete = list(bucket.list_blobs()) # Converte iterador para lista
-                            if blobs_to_delete:
-                                print(f"A apagar {len(blobs_to_delete)} objetos do bucket {user.gcs_bucket_name}...")
-                                for blob_item in blobs_to_delete: # Iterar sobre a lista copiada
-                                    blob_item.delete() # Apaga cada blob
-
-                            # Após esvaziar, apagar o bucket
-                            print(f"A apagar bucket: {user.gcs_bucket_name}")
-                            bucket.delete() # Opcional: force=True se tiver problemas com versões, etc.
-                            deleted_buckets_info.append(f"Bucket {user.gcs_bucket_name} apagado.")
-                        else:
-                            deleted_buckets_info.append(f"Bucket {user.gcs_bucket_name} não encontrado no GCS (mas estava no DB).")
-                    except Exception as e:
-                        error_msg = f"Erro ao apagar bucket {user.gcs_bucket_name} ou os seus conteúdos: {str(e)}"
-                        print(error_msg)
-                        errors_info.append(error_msg)
-            
-            # 2. Apagar todos os utilizadores da base de dados
-            if users_to_delete:
-                num_deleted_users = db.session.query(User).delete()
-                db.session.commit()
-                print(f"{num_deleted_users} utilizador(es) apagado(s) da base de dados.")
-            else:
-                print("Nenhum utilizador encontrado para apagar.")
-
-            # 3. Reiniciar a sequência de ID para a tabela 'user' (específico para PostgreSQL)
-            # O nome da sequência é geralmente <nome_tabela>_<nome_coluna_id>_seq
-            # Para a tabela 'user' e coluna 'id', o nome provável é 'user_id_seq'
-            try:
-                # Primeiro, tente obter o nome real da sequência (forma mais robusta)
-                # Esta query é específica para PostgreSQL
-                sequence_sql = text("""
-                    SELECT pg_get_serial_sequence('public.user', 'id');
-                """)
-                result = db.session.execute(sequence_sql).scalar_one_or_none()
-                
-                sequence_name = None
-                if result:
-                    # O resultado pode ser 'public.user_id_seq', precisamos apenas de 'user_id_seq' se o schema for public
-                    sequence_name = result.split('.')[-1] if '.' in result else result
-
-                if sequence_name:
-                    print(f"A reiniciar a sequência da tabela 'user' chamada '{sequence_name}' para 1.")
-                    db.session.execute(text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1;"))
-                    db.session.commit()
-                    success_msg_id_reset = f"Sequência de ID '{sequence_name}' reiniciada para 1."
-                else:
-                    # Fallback para o nome comum se a query acima não funcionar ou não for PostgreSQL
-                    print("Nome da sequência não determinado automaticamente, a tentar 'user_id_seq'.")
-                    db.session.execute(text("ALTER SEQUENCE user_id_seq RESTART WITH 1;"))
-                    db.session.commit()
-                    success_msg_id_reset = "Sequência de ID 'user_id_seq' reiniciada para 1 (tentativa com nome padrão)."
-                
-                errors_info.append(success_msg_id_reset) # Adicionar aos 'erros' para fins de relatório
-            except Exception as e:
-                error_msg_id_reset = f"Erro ao reiniciar a sequência de ID: {str(e)}. Pode precisar de fazer isto manualmente no seu DB."
-                print(error_msg_id_reset)
-                errors_info.append(error_msg_id_reset)
-
-            return jsonify({
-                "message": "Processo de reset concluído.",
-                "deleted_users_count": num_deleted_users if users_to_delete else 0,
-                "deleted_buckets_log": deleted_buckets_info,
-                "operation_errors_or_status": errors_info
-            }), 200
-
-        except Exception as e:
-            # Erro geral durante o processo
-            print(f"Erro geral durante o reset: {str(e)}")
-            return jsonify({"error": f"Erro geral durante o processo de reset: {str(e)}"}), 500
-    
-    # Se for um pedido GET, mostra um formulário de confirmação simples
-    return """
-        <html><head><title>Confirmar Reset Total</title></head><body>
-        <h1>ATENÇÃO: AÇÃO DESTRUTIVA!</h1>
-        <p>Você está prestes a apagar TODOS os utilizadores, TODOS os seus buckets GCS associados,
-        e reiniciar a contagem de IDs na base de dados.</p>
-        <p><strong>Esta ação não pode ser desfeita.</strong></p>
-        <form method="POST">
-            <p>Para confirmar, clique no botão abaixo. Só funciona em modo DEBUG.</p>
-            <button type="submit">CONFIRMAR E APAGAR TUDO</button>
-        </form>
-        <p><a href="/">Voltar para a página inicial</a></p>
-        </body></html>
-    """
 
 # --------------------------------------------------------------------------------------------------------
 

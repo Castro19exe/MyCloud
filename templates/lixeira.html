@@ -1,12 +1,18 @@
-<!DOCTYPE html>
+
 <html lang="pt">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>My Cloud</title>
+    <title>Reciclagem - My Cloud</title>
     <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main_popups.js') }}"></script>
+    <style>
+        main table td.lixeira-table-actions {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,7 +24,8 @@
                     </div>
                     <div class="account-username">
                         {% if current_user.is_authenticated %}
-                            {{ current_user.email.split('@')[0] }} {% else %}
+                            {{ current_user.email.split('@')[0] }}
+                        {% else %}
                             Conta
                         {% endif %}
                     </div>
@@ -48,20 +55,22 @@
                     </ul>
                 </div>
             </div>
+
             <h2>My Cloud</h2> 
-            <a href="{{ url_for('home') }}" class="nav-link active">
+            
+            <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20" fill="currentColor">
                     <path d="M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 184.4c-17-15.2-39.4-24.4-64-24.4L64 256c-24.6 0-47 9.2-64 24.4L0 96zM64 288l384 0c35.3 0 64 28.7 64 64l0 64c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64zM320 416a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm128-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>
                 </svg>
                 <span>Meu Disco</span>
             </a>
-            <a href="{{ url_for('compartilhados_page') }}" class="nav-link">
+            <a href="{{ url_for('compartilhados_page') }}" class="nav-link {% if request.endpoint == 'compartilhados_page' %}active{% endif %}">
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                 </svg>
                 <span>Compartilhados</span>
             </a>
-            <a href="{{ url_for('lixeira_page') }}" class="nav-link">
+            <a href="{{ url_for('lixeira_page') }}" class="nav-link {% if request.endpoint == 'lixeira_page' %}active{% endif %}">
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
@@ -70,64 +79,92 @@
         </nav>
         <main>
             <div class="header-section">
-                <h1>Meu Disco</h1>
-                <div class="upload-section">
-                    <label for="fileInput" class="custom-file-label">Escolher ficheiro</label>
-                    <input type="file" id="fileInput" />
-                    <button id="upload-btn">
-                        <svg class="btn-icon upload-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
-                            <path d="M288 109.3L288 352c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-242.7-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352l128 0c0 35.3 28.7 64 64 64s64-28.7 64-64l128 0c35.3 0 64 28.7 64 64l0 32c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64l0-32c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/>
-                        </svg>
-                        Carregar
-                    </button>
-                </div>
+                <h1>Reciclagem</h1>
+                {% if trashed_files %}
+                <p style="margin-top: 5px; color: #555;">Ficheiros movidos para a reciclagem. A eliminação permanente não pode ser desfeita.</p>
+                {% else %}
+                <p style="margin-top: 5px; color: #555;">A sua reciclagem está vazia.</p>
+                {% endif %}
             </div>
+
             <table>
                 <thead>
                     <tr>
                         <th>Nome</th>
                         <th>Tipo</th>
                         <th>Tamanho</th>
-                        <th>Modificado</th>
-                        <th>Ações</th> </tr>
+                        <th>Data na Reciclagem</th> 
+                        <th>Ações</th>
+                    </tr>
                 </thead>
-                <tbody id="file-list">
-                    {% if files %}
-                        {% for file in files %}
+                <tbody id="trash-file-list">
+                    {% if trashed_files %}
+                        {% for file in trashed_files %}
                         <tr>
                             <td>
-                                <span class="file-icon {{ file.icon_class }}"></span> {{ file.name }}
+                                <span class="file-icon {{ file.icon_class }}"></span> 
+                                {{ file.original_name_display }} {# Usa a nova chave para o nome original #}
                             </td>
                             <td>{{ file.type }}</td>
                             <td>{{ file.size }}</td>
                             <td>{{ file.modified }}</td>
-                            <td>
-                                <a href="{{ url_for('download_file', filename=file.name) }}" class="action-btn download-btn">
-                                    <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor">
-                                        <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5-12.5 12.5 32.8 0 45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
-                                    </svg>
-                                    <span>Descarregar</span>
-                                </a>
-                                
-                                <form method="POST" action="{{ url_for('move_to_trash', filename=file.name) }}" class="action-form" onsubmit="return confirm('Tem a certeza que quer mover este ficheiro para a lixeira?');">
-                                    <button type="submit" class="action-btn delete-btn">
-                                        <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                        </svg>
-                                        <span>Eliminar</span>
-                                    </button>
-                                </form>
+                            <td class="lixeira-table-actions">
+                                <button class="action-btn restore-btn" disabled title="Funcionalidade em breve">
+                                    <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M15.322 10.774a5.002 5.002 0 00-5.363-4.29.5.5 0 00-.253.13L6.646 9.677a.5.5 0 00.666.748l2.748-2.504a3.999 3.999 0 015.006 3.168.5.5 0 00.99.086A5.002 5.002 0 0015.322 10.774zM4.678 9.226a5.002 5.002 0 005.363 4.29.5.5 0 00.253-.13l3.06-3.06a.5.5 0 00-.666-.748L9.936 12.29a3.999 3.999 0 01-5.006-3.168.5.5 0 00-.99-.086A5.002 5.002 0 004.678 9.226z" clip-rule="evenodd" /><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" /></svg>
+                                    <span>Restaurar</span>
+                                </button>
+                                <button type="button" class="action-btn perm-delete-btn" onclick="confirmPermanentDelete('{{ file.name }}')">
+                                    <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                    <span>Apagar Perm.</span>
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="5" style="text-align: center;">Nenhum ficheiro encontrado.</td>
+                            <td colspan="5" style="text-align: center;">A sua lixeira está vazia.</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
         </main>
     </div>
+
+    <div class="popup-messages-container" id="popup-messages-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="popup-message {{ category }}">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close-popup">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+    // JavaScript para confirmação e submissão da eliminação permanente
+    function confirmPermanentDelete(fullFilenameInTrash) {
+        if (confirm("Tem a certeza que quer apagar permanentemente este ficheiro? Esta ação não pode ser desfeita.")) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            // A rota no Flask espera o nome completo do ficheiro, incluindo o prefixo da lixeira
+            form.action = "{{ url_for('delete_permanently_from_trash_route', full_trash_filename='PLACEHOLDER_TO_REPLACE') }}".replace('PLACEHOLDER_TO_REPLACE', encodeURIComponent(fullFilenameInTrash));
+            
+            // Para proteção CSRF com Flask-WTF (se estiver a usar)
+            // const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+            // if (csrfTokenMeta) {
+            //     const csrfTokenInput = document.createElement('input');
+            //     csrfTokenInput.type = 'hidden';
+            //     csrfTokenInput.name = 'csrf_token';
+            //     csrfTokenInput.value = csrfTokenMeta.getAttribute('content');
+            //     form.appendChild(csrfTokenInput);
+            // }
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    </script>
 </body>
 </html>

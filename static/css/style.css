@@ -38,18 +38,15 @@ nav a {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  border-left: 4px solid transparent;
 }
 nav a:hover, nav a.active {
   background-color: rgba(255,255,255,0.2);
-  border-left: 4px solid #fff;
 }
 
-/* Estilos para os links de navegação principais e seus ícones */
-nav a.nav-link { /* Seleciona os <a> com a classe nav-link dentro da nav */
-    display: flex; /* Alinha o ícone e o texto na horizontal */
-    align-items: center; /* Alinha verticalmente o ícone e o texto */
-    padding: 12px 24px; /* Mesmo padding que você já tinha */
+nav a.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
     color: white;
     text-decoration: none;
     font-weight: 600;
@@ -82,12 +79,12 @@ nav a.nav-link.active { /* Se a classe 'active' for usada para o item atual */
   user-select: none;
 }
 
-.account-menu-content {
+/* .account-menu-content {
   display: none; 
 }
 .account-menu-content.open {
   display: block; 
-}
+} */
 
 .avatar {
   width: 40px;
@@ -152,9 +149,15 @@ main h1 {
   font-size: 16px;
   transition: background-color 0.3s ease;
 }
-
 #upload-btn:hover {
   background-color: #45a049;
+}
+
+#upload-btn .btn-icon {
+  margin-right: 8px; 
+  fill: white; /* ESTA LINHA TORNA O ÍCONE BRANCO */
+  /* width: 16px; Defina o tamanho se não o fez no HTML */
+  /* height: 16px; Defina o tamanho se não o fez no HTML */
 }
 
 /* Tabela de ficheiros */
@@ -208,10 +211,10 @@ tbody tr:hover {
 
 .account-dropdown {
     position: relative;
-    display: block; /* Ocupa a largura da nav */
-    padding: 10px 15px; /* Padding interno para toda a secção da conta */
-    border-bottom: 1px solid rgba(255,255,255,0.2); /* Linha separadora mais subtil */
-    margin-bottom: 15px; /* Espaço antes do título "My Cloud" */
+    display: block; 
+    padding: 15px 20px; /* Padding aumentado */
+    border-bottom: 1px solid rgba(255,255,255,0.15); 
+    margin-bottom: 20px; 
 }
 
 .account-trigger {
@@ -279,17 +282,16 @@ tbody tr:hover {
 .account-menu-content {
     display: none; 
     position: absolute;
-    top: calc(100% + 5px); /* Posiciona abaixo do .account-dropdown, com pequeno espaço */
-    right: 15px; /* Alinha à direita, considerando o padding do .account-dropdown */
-    left: 15px; /* Opcional: faz o menu ter a mesma largura do padding, ou use min-width */
+    top: calc(100% + 5px); 
+    right: 15px; 
+    left: 15px; 
     background-color: #ffffff;
-    min-width: calc(100% - 30px); /* Tenta ocupar a largura do .account-dropdown */
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+    min-width: calc(100% - 30px); 
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.12); /* Sombra mais suave */
     border-radius: 8px;
-    z-index: 100; 
-    /* margin-top: 8px; Removido, pois 'top' agora inclui o espaço */
+    z-index: 1000; /* Alto z-index */
     overflow: hidden; 
-    padding: 8px 0; /* Padding vertical para os itens do menu */
+    padding: 8px 0; 
 }
 
 .account-menu-content.open {
@@ -326,4 +328,141 @@ tbody tr:hover {
 }
 .account-menu-content ul li a:hover svg {
     fill: #2c3e50;
+}
+
+/* Botões de Ação na Tabela (Download, Eliminar) */
+.action-form {
+    display: inline-block; 
+    margin: 0; 
+}
+
+.action-btn {
+    display: inline-flex; 
+    align-items: center; 
+    padding: 5px 10px; /* Ligeiramente menor para caber bem */
+    margin: 2px 3px 2px 0; 
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.2; 
+}
+
+.action-btn .action-icon {
+    width: 14px; /* Ícones dos botões um pouco menores */
+    height: 14px;
+    margin-right: 5px; 
+    fill: currentColor; 
+}
+
+.download-btn {
+  background-color: #1a73e8; 
+  color: white;
+  border-color: #1a73e8;
+}
+.download-btn:hover {
+  background-color: #1765c7; 
+  border-color: #1765c7;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #d93025; 
+  color: white;
+  border-color: #d93025;
+}
+.delete-btn:hover {
+  background-color: #b0261c; 
+  border-color: #b0261c;
+  color: white;
+}
+
+
+
+
+
+
+
+.action-form {
+    display: inline-block; 
+    margin: 0; 
+}
+
+.action-btn {
+    display: inline-flex; 
+    align-items: center; 
+    padding: 5px 10px; 
+    margin: 2px 3px 2px 0; 
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.2; 
+}
+
+.action-btn .action-icon {
+    width: 14px; 
+    height: 14px;
+    margin-right: 5px; 
+    fill: currentColor; 
+}
+
+/* Botão de Download (já deve ter) */
+.download-btn {
+    background-color: #1a73e8; 
+    color: white;
+    border-color: #1a73e8;
+}
+.download-btn:hover {
+    background-color: #1765c7; 
+    border-color: #1765c7;
+    color: white;
+}
+
+/* Botão de Eliminar (já deve ter) */
+.delete-btn { /* Este é para mover para a lixeira no index.html */
+    background-color: #d93025; 
+    color: white;
+    border-color: #d93025;
+}
+.delete-btn:hover {
+    background-color: #b0261c; 
+    border-color: #b0261c;
+    color: white;
+}
+
+/* Botões específicos da Lixeira (Apagar Permanente e Restaurar) */
+.lixeira-table-actions .restore-btn {
+    background-color: #e8f5e9; /* Verde claro */
+    border-color: #a5d6a7;
+    color: #2e7d32;
+}
+.lixeira-table-actions .restore-btn:hover:not(:disabled) {
+    background-color: #c8e6c9;
+}
+
+.lixeira-table-actions .perm-delete-btn { /* Este é para apagar permanentemente na lixeira.html */
+    background-color: #ffebee; /* Vermelho mais claro que o delete-btn normal */
+    border-color: #ef9a9a;
+    color: #c62828;
+}
+.lixeira-table-actions .perm-delete-btn:hover:not(:disabled) {
+    background-color: #ffcdd2;
+}
+
+/* Estilo para botões desabilitados (genérico) */
+.action-btn:disabled {
+    background-color: #f0f0f0 !important; /* Usa !important para sobrescrever outros fundos */
+    color: #aaa !important;
+    border-color: #ddd !important;
+    cursor: not-allowed;
+}
+.action-btn:disabled .action-icon {
+    fill: #aaa !important;
 }

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compartilhados - My Cloud</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main_popups.js') }}"></script> 
+    <style>
+         .coming-soon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+            height: calc(100vh - 120px); /* Ajuste conforme a altura da sua navbar/header */
+            color: #555;
+        }
+        .coming-soon-container svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            color: #6e8efb; /* Cor do seu tema */
+        }
+        .coming-soon-container h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .coming-soon-container p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .coming-soon-container .back-link {
+            padding: 10px 20px;
+            background-color: #6e8efb;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .coming-soon-container .back-link:hover {
+            background-color: #5a78e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="account-dropdown" id="account-section">
+                <div class="account-trigger" id="account-info">
+                    <div class="avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="account-username">
+                        {% if current_user.is_authenticated %}
+                            {{ current_user.email.split('@')[0] }}
+                        {% else %}
+                            Conta
+                        {% endif %}
+                    </div>
+                    <i class="arrow-icon" id="account-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </i>
+                </div>
+                <div class="account-menu-content" id="account-menu">
+                    <ul>
+                        {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('logout_page') }}" id="logout-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>
+                            Terminar Sessão
+                        </a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('login_page') }}" id="login-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            Iniciar Sessão
+                        </a></li>
+                        <li><a href="{{ url_for('register_page') }}" id="register-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16px" height="16px" style="margin-right: 8px; vertical-align: middle;"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" /></svg>
+                            Criar Conta
+                        </a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <h2>My Cloud</h2> 
+            
+            <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="20" height="20" fill="currentColor">
+                    <path d="M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 184.4c-17-15.2-39.4-24.4-64-24.4L64 256c-24.6 0-47 9.2-64 24.4L0 96zM64 288l384 0c35.3 0 64 28.7 64 64l0 64c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64zM320 416a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm128-32a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/>
+                </svg>
+                <span>Meu Disco</span>
+            </a>
+            <a href="{{ url_for('compartilhados_page') }}" class="nav-link {% if request.endpoint == 'compartilhados_page' %}active{% endif %}">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+                <span>Compartilhados</span>
+            </a>
+            <a href="{{ url_for('lixeira_page') }}" class="nav-link {% if request.endpoint == 'lixeira_page' %}active{% endif %}">
+                <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span>Reciclagem</span>
+            </a>
+        </nav>
+        <main>
+            <div class="coming-soon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.472-2.472a3.75 3.75 0 00-5.303-5.303L6.25 9.75M11.42 15.17L6.25 9.75m5.17 5.42l-2.472-2.472a3.75 3.75 0 005.303-5.303L17.25 21M3 21l18-18" />
+                </svg>
+                <h1>Funcionalidade em Breve!</h1>
+                <p>A secção de ficheiros compartilhados ainda está em desenvolvimento.<br>Volte mais tarde!</p>
+                <a href="{{ url_for('home') }}" class="back-link">Voltar Atrás</a>
+            </div>       
+        </main>
+    </div>
+
+    <div class="popup-messages-container" id="popup-messages-container"></div>
+</body>
+</html>
