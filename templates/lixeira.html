@@ -1,14 +1,16 @@
-
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Reciclagem - My Cloud</title>
+    <title>Lixeira - My Cloud</title>
     <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main_popups.js') }}"></script>
     <style>
+        /* Estilos rápidos para os botões de ação na lixeira, pode mover para o seu CSS principal */
+        /* Assegure que as classes .action-btn, .restore-btn, .perm-delete-btn estão definidas no style.css principal */
         main table td.lixeira-table-actions {
             white-space: nowrap;
         }
@@ -17,6 +19,7 @@
 <body>
     <div class="container">
         <nav>
+            <!-- Secção da Conta (Dropdown) -->
             <div class="account-dropdown" id="account-section">
                 <div class="account-trigger" id="account-info">
                     <div class="avatar">
@@ -74,26 +77,26 @@
                 <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                <span>Reciclagem</span>
+                <span>Lixeira</span>
             </a>
         </nav>
         <main>
             <div class="header-section">
-                <h1>Reciclagem</h1>
+                <h1>Lixeira</h1>
                 {% if trashed_files %}
-                <p style="margin-top: 5px; color: #555;">Ficheiros movidos para a reciclagem. A eliminação permanente não pode ser desfeita.</p>
+                <p style="margin-top: 5px; color: #555;">Ficheiros movidos para a lixeira.</p>
                 {% else %}
-                <p style="margin-top: 5px; color: #555;">A sua reciclagem está vazia.</p>
+                <p style="margin-top: 5px; color: #555;">A sua lixeira está vazia.</p>
                 {% endif %}
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th>Nome</th>
+                        <th>Nome Original</th>
                         <th>Tipo</th>
                         <th>Tamanho</th>
-                        <th>Data na Reciclagem</th> 
+                        <th>Data na Lixeira</th> 
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -103,13 +106,13 @@
                         <tr>
                             <td>
                                 <span class="file-icon {{ file.icon_class }}"></span> 
-                                {{ file.original_name_display }} {# Usa a nova chave para o nome original #}
+                                {{ file.original_name_display }}
                             </td>
                             <td>{{ file.type }}</td>
                             <td>{{ file.size }}</td>
                             <td>{{ file.modified }}</td>
                             <td class="lixeira-table-actions">
-                                <button class="action-btn restore-btn" disabled title="Funcionalidade em breve">
+                                <button type="button" class="action-btn restore-btn" onclick="confirmRestoreFile('{{ file.name }}')">
                                     <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M15.322 10.774a5.002 5.002 0 00-5.363-4.29.5.5 0 00-.253.13L6.646 9.677a.5.5 0 00.666.748l2.748-2.504a3.999 3.999 0 015.006 3.168.5.5 0 00.99.086A5.002 5.002 0 0015.322 10.774zM4.678 9.226a5.002 5.002 0 005.363 4.29.5.5 0 00.253-.13l3.06-3.06a.5.5 0 00-.666-.748L9.936 12.29a3.999 3.999 0 01-5.006-3.168.5.5 0 00-.99-.086A5.002 5.002 0 004.678 9.226z" clip-rule="evenodd" /><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" /></svg>
                                     <span>Restaurar</span>
                                 </button>
@@ -130,6 +133,7 @@
         </main>
     </div>
 
+    <!-- Container Global para Popups -->
     <div class="popup-messages-container" id="popup-messages-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -149,18 +153,19 @@
         if (confirm("Tem a certeza que quer apagar permanentemente este ficheiro? Esta ação não pode ser desfeita.")) {
             const form = document.createElement('form');
             form.method = 'POST';
-            // A rota no Flask espera o nome completo do ficheiro, incluindo o prefixo da lixeira
             form.action = "{{ url_for('delete_permanently_from_trash_route', full_trash_filename='PLACEHOLDER_TO_REPLACE') }}".replace('PLACEHOLDER_TO_REPLACE', encodeURIComponent(fullFilenameInTrash));
-            
-            // Para proteção CSRF com Flask-WTF (se estiver a usar)
-            // const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-            // if (csrfTokenMeta) {
-            //     const csrfTokenInput = document.createElement('input');
-            //     csrfTokenInput.type = 'hidden';
-            //     csrfTokenInput.name = 'csrf_token';
-            //     csrfTokenInput.value = csrfTokenMeta.getAttribute('content');
-            //     form.appendChild(csrfTokenInput);
-            // }
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // NOVA FUNÇÃO JavaScript para confirmação e submissão da restauração
+    function confirmRestoreFile(fullFilenameInTrash) {
+        if (confirm("Tem a certeza que quer restaurar este ficheiro da lixeira?")) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            // A rota no Flask espera o nome completo do ficheiro na lixeira (com prefixo)
+            form.action = "{{ url_for('restore_from_trash_route', full_trash_filename='PLACEHOLDER_TO_REPLACE') }}".replace('PLACEHOLDER_TO_REPLACE', encodeURIComponent(fullFilenameInTrash));
             document.body.appendChild(form);
             form.submit();
         }

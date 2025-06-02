@@ -1,15 +1,16 @@
 # My Cloud
 
-Bem-vindo ao My Cloud! Esta é uma aplicação web desenvolvida em Python com Flask que permite aos utilizadores registarem-se, fazerem login e armazenarem ficheiros leves na Google Cloud Platform (GCP). Cada utilizador tem o seu próprio bucket dedicado no Google Cloud Storage (GCS).
+Bem-vindo ao My Cloud! Esta é uma aplicação web desenvolvida em Python com Flask, que permite aos utilizadores armazenarem ficheiros leves na Google Cloud Platform (GCP). Cada utilizador tem o seu próprio bucket dedicado no Google Cloud Storage (GCS).
 
 ## Funcionalidades Implementadas
 
-* Registo de novos utilizadores.
+* Registo de utilizadores.
 * Autenticação de utilizadores (Login/Logout).
 * Criação automática de um bucket GCS dedicado para cada novo utilizador.
 * Upload de ficheiros para o bucket do utilizador.
 * Listagem dos ficheiros do utilizador a partir do seu bucket.
-* Download de ficheiros.
+* Carregamento de ficheiros para dentro do disco do utilizador.
+* Apagar ficheiros.
 
 ## Pré-requisitos (para Desenvolvimento Local)
 

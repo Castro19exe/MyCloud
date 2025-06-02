@@ -23,12 +23,10 @@ DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_NAME = os.environ.get('DB_NAME')
 
-# Variáveis específicas para cada ambiente
-INSTANCE_CONNECTION_NAME = os.environ.get('INSTANCE_CONNECTION_NAME') # Para Cloud Run (ex: 'seu-projeto:regiao:instancia')
-DB_HOST = os.environ.get('DB_HOST') # Para desenvolvimento local via proxy TCP
-DB_PORT = os.environ.get('DB_PORT') # Para desenvolvimento local via proxy TCP
+INSTANCE_CONNECTION_NAME = os.environ.get('INSTANCE_CONNECTION_NAME')
+DB_HOST = os.environ.get('DB_HOST')
+DB_PORT = os.environ.get('DB_PORT')
 
-# Determinar se estamos no Cloud Run (K_SERVICE é uma variável de ambiente definida pelo Cloud Run)
 IS_RUNNING_ON_CLOUD_RUN = os.environ.get('K_SERVICE') is not None
 
 if IS_RUNNING_ON_CLOUD_RUN:
@@ -462,6 +460,61 @@ def delete_permanently_from_trash_route(full_trash_filename): # Nome da função
         flash(f"Erro ao apagar permanentemente o ficheiro: {str(e)}", "danger")
     return redirect(url_for('lixeira_page'))
 
+
+# NOVA ROTA PARA RESTAURAR FICHEIROS DA LIXEIRA
+@app.route('/restore_from_trash/<path:full_trash_filename>', methods=['POST'])
+@login_required
+def restore_from_trash_route(full_trash_filename):
+    if not current_user.gcs_bucket_name:
+        flash("Utilizador não tem um bucket configurado.", "danger")
+        return redirect(url_for('lixeira_page'))
+
+    # Verifica se o ficheiro está realmente no prefixo da lixeira
+    if not full_trash_filename.startswith(TRASH_PREFIX):
+        flash("Operação inválida: O ficheiro selecionado não está na lixeira.", "danger")
+        return redirect(url_for('lixeira_page'))
+
+    try:
+        storage_client = storage.Client(project=GCP_PROJECT_ID)
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+        
+        blob_in_trash = bucket.blob(full_trash_filename)
+
+        if not blob_in_trash.exists():
+            flash(f"O ficheiro '{full_trash_filename.replace(TRASH_PREFIX, '', 1)}' não foi encontrado na lixeira.", "warning")
+            return redirect(url_for('lixeira_page'))
+
+        # Define o nome do ficheiro no destino (removendo o prefixo da lixeira)
+        original_filename = full_trash_filename.replace(TRASH_PREFIX, '', 1)
+        
+        # Lógica para evitar sobrescrever ficheiros existentes em "Meus Ficheiros"
+        # Se um ficheiro com o mesmo nome já existir, adiciona um sufixo numérico.
+        destination_blob_name = original_filename
+        counter = 1
+        name_part, ext_part = os.path.splitext(original_filename)
+        while bucket.blob(destination_blob_name).exists():
+            destination_blob_name = f"{name_part}({counter}){ext_part}"
+            counter += 1
+        
+        print(f"A restaurar '{full_trash_filename}' para '{destination_blob_name}' no bucket {bucket.name}")
+
+        # Copia o blob da lixeira para o novo local (sem o prefixo da lixeira)
+        restored_blob = bucket.copy_blob(blob_in_trash, bucket, destination_blob_name)
+        
+        # Se a cópia for bem-sucedida, apaga o ficheiro da lixeira
+        if restored_blob.exists():
+            blob_in_trash.delete()
+            flash(f"Ficheiro '{original_filename}' restaurado com sucesso para 'Meu Disco'.", "success")
+            if destination_blob_name != original_filename:
+                 flash(f"Nota: O ficheiro foi restaurado como '{destination_blob_name}' para evitar conflito de nomes.", "info")
+        else:
+            flash(f"Falha ao restaurar o ficheiro '{original_filename}'.", "danger")
+
+    except Exception as e:
+        print(f"Erro ao restaurar ficheiro '{full_trash_filename}' da lixeira: {e}")
+        flash(f"Erro ao restaurar ficheiro: {str(e)}", "danger")
+    
+    return redirect(url_for('lixeira_page'))
 # ------------------------------ UTILIZAÇÃO APENAS EM DEVELOPMENT ------------------------------ #
 
 # Rota de Depuração Temporária
