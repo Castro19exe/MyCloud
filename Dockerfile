@@ -1,6 +1,3 @@
-# Ficheiro: Dockerfile
-
-# 1. Usar uma imagem base oficial do Python.
 # python:3.11-slim é uma boa escolha por ser mais leve.gcloud auth application-default set-quota-project airy-bit-460116-k8
 FROM python:3.11-slim
 

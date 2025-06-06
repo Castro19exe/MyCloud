@@ -371,15 +371,15 @@ def view_file(filename):
             flash(f"O ficheiro '{safe_filename_display}' não foi encontrado.", "warning")
             return redirect(url_for('home'))
         
-        blob_content_type_for_response = blob.content_type or 'application/octet-stream'
-
+        # O ÚNICO CÓDIGO NECESSÁRIO PARA A URL ASSINADA DE VISUALIZAÇÃO
         signed_url = blob.generate_signed_url(
             version="v4",
             expiration=timedelta(minutes=15),
             method="GET",
-            response_disposition='inline',
-            response_content_type=blob_content_type_for_response
+            response_disposition='inline'  # Importante para dizer ao browser para mostrar o ficheiro
         )
+        # Não precisamos de mais nenhum parâmetro. O Google usará o Content-Type guardado no upload.
+        
         return redirect(signed_url)
         
     except Exception as e:

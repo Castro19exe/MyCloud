@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof createPopupMessage === 'function') {
                         createPopupMessage(result.error || `Erro ${response.status}: Falha no registo.`, 'error');
                     } else {
-                        alert(result.error || `Erro ${response.status}: Falha no registo.`);
+                        // alert(result.error || `Erro ${response.status}: Falha no registo.`);
                     }
                     // Esconder spinner e reabilitar botão em caso de erro
                     spinnerOverlay.style.display = 'none';
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof createPopupMessage === 'function') {
                     createPopupMessage('Ocorreu um erro de rede ou servidor. Tente novamente.', 'error');
                 } else {
-                    alert('Ocorreu um erro de rede ou servidor. Tente novamente.');
+                    // alert('Ocorreu um erro de rede ou servidor. Tente novamente.');
                 }
                 
                 spinnerOverlay.style.display = 'none';

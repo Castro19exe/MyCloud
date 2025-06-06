@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     spinnerOverlay.style.display = 'none';
                     submitButton.disabled = false;
                     submitButton.textContent = 'Login';
-                    alert(result.error || 'Falha no login. Verifique suas credenciais.');
+                    // alert(result.error || 'Falha no login. Verifique suas credenciais.');
                 }
             } catch (error) {
                 console.error('Erro ao tentar fazer login:', error);
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 spinnerOverlay.style.display = 'none';
                 submitButton.disabled = false;
                 submitButton.textContent = 'Login';
-                alert('Ocorreu um erro de rede ou servidor ao tentar fazer login.');
+                // alert('Ocorreu um erro de rede ou servidor ao tentar fazer login.');
             }
             // Não é necessário um bloco finally se tratamos o estado do spinner/botão em cada branch (sucesso com redirect vs erro)
             // Se o redirecionamento for a única ação no sucesso, o estado do botão/spinner não importa após ele.

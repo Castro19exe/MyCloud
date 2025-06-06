@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadBtn.addEventListener('click', async () => {
             const file = fileInput.files[0];
             if (!file) {
-                alert('Por favor, escolha um ficheiro primeiro.');
+                // alert('Por favor, escolha um ficheiro primeiro.');
                 return;
             }
             const formData = new FormData();
@@ -40,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(typeof createPopupMessage === 'function'){
                         createPopupMessage(result.message || 'Ficheiro enviado com sucesso!', 'success');
                     } else {
-                        alert(result.message || 'Ficheiro enviado com sucesso!');
+                        // alert(result.message || 'Ficheiro enviado com sucesso!');
                     }
-                    setTimeout(() => window.location.reload(), 1500); // Recarrega após 1.5s para ver a mensagem
+                    setTimeout(() => window.location.reload(), 1500);
                 } else {
                     if(typeof createPopupMessage === 'function'){
                         createPopupMessage(result.error || 'Erro ao enviar o ficheiro.', 'error');
                     } else {
-                        alert(result.error || 'Erro ao enviar o ficheiro.');
+                        // alert(result.error || 'Erro ao enviar o ficheiro.');
                     }
                 }
             } catch (error) {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(typeof createPopupMessage === 'function'){
                     createPopupMessage('Ocorreu um erro de rede ou servidor durante o upload.', 'error');
                 } else {
-                    alert('Ocorreu um erro de rede ou servidor durante o upload.');
+                    // alert('Ocorreu um erro de rede ou servidor durante o upload.');
                 }
             } finally {
                 uploadBtn.disabled = false;
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (selectedFiles.length === 0) {
-                alert('Nenhum ficheiro selecionado para mover para a lixeira.');
+                // alert('Nenhum ficheiro selecionado para mover para a lixeira.');
                 return;
             }
 
@@ -157,14 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(typeof createPopupMessage === 'function'){
                             createPopupMessage(result.message || `${selectedFiles.length} ficheiro(s) movido(s) para a lixeira.`, 'success');
                         } else {
-                            alert(result.message || `${selectedFiles.length} ficheiro(s) movido(s) para a lixeira.`);
+                            // alert(result.message || `${selectedFiles.length} ficheiro(s) movido(s) para a lixeira.`);
                         }
                         setTimeout(() => window.location.reload(), 1500);
                     } else {
                         if(typeof createPopupMessage === 'function'){
                            createPopupMessage(result.error || 'Erro ao mover ficheiros para a lixeira.', 'error');
                         } else {
-                            alert(result.error || 'Erro ao mover ficheiros para a lixeira.');
+                            // alert(result.error || 'Erro ao mover ficheiros para a lixeira.');
                         }
                     }
                 } catch (error) {
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(typeof createPopupMessage === 'function'){
                         createPopupMessage('Ocorreu um erro de rede ou servidor.', 'error');
                     } else {
-                        alert('Ocorreu um erro de rede ou servidor.');
+                        // alert('Ocorreu um erro de rede ou servidor.');
                     }
                 }
             }
