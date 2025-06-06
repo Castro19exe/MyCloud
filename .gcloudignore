@@ -1,0 +1,16 @@
+# Este ficheiro substitui o .gitignore para os comandos gcloud.
+
+# Ignorar o ambiente virtual
+venv/
+
+# Ignorar a pasta do Git
+.git/
+
+# Ignorar os ficheiros de cache do Python
+__pycache__/
+*.pyc
+
+# Ignorar ficheiros de segredos e de configuração de IDEs
+.env
+.vscode/
+.idea/

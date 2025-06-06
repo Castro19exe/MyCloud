@@ -6,15 +6,16 @@ ENV/
 
 # Ficheiros de Cache e Compilados do Python
 __pycache__/
-*.py[cod] # Abrange .pyc, .pyo, .pyd
+#*.py[cod] # Abrange .pyc, .pyo, .pyd
 *.so
 *.egg-info/
 .Python
 
 # Ficheiros de Configuração Local e Segredos
 .env
-*.json
+# *.json
 airy-bit-460116-k8-1b7b49d458ae.json
+service-account-key.json
 
 # Ficheiros de IDEs e Editores
 .vscode/    # Se usar VS Code e não quiser partilhar as configurações do workspace

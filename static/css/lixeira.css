@@ -11,13 +11,14 @@ body, html {
   color: #333;
 }
 
+/* Layout Principal */
 .container {
   display: flex;
   height: 100vh;
   overflow: hidden;
 }
 
-/* --- Barra de Navegação Vertical --- */
+/* --- Barra de Navegação Vertical (nav) --- */
 nav {
   width: 240px;
   background-color: #1a73e8;
@@ -28,14 +29,15 @@ nav {
   flex-shrink: 0;
 }
 
-nav h2 {
+nav h2 { /* Título "My Cloud" */
   margin: 0px 24px 20px 24px;
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  padding-top: 10px;
+  padding-top: 10px; /* Espaço após a secção da conta */
 }
 
+/* Links de Navegação Principais (Meu Disco, Compartilhados, etc.) */
 nav a.nav-link {
   display: flex;
   align-items: center;
@@ -54,7 +56,7 @@ nav a.nav-link.active {
   border-left: 4px solid #fff;
 }
 
-.nav-icon {
+.nav-icon { /* Ícones SVG nos links de navegação */
   width: 20px;
   height: 20px;
   margin-right: 15px;
@@ -62,7 +64,7 @@ nav a.nav-link.active {
   flex-shrink: 0;
 }
 
-.nav-link span {
+.nav-link span { /* Texto nos links de navegação */
   flex-grow: 1;
 }
 
@@ -75,7 +77,7 @@ nav a.nav-link.active {
     margin-bottom: 20px;
 }
 
-.account-trigger {
+.account-trigger { /* A área clicável: avatar, nome, seta */
     display: flex;
     align-items: center;
     padding: 8px 0;
@@ -89,11 +91,11 @@ nav a.nav-link.active {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.account-trigger .avatar {
+.account-trigger .avatar { /* Estilo para o avatar dentro do trigger */
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.25); /* Mantido o seu estilo para SVG */
+    background-color: rgba(255, 255, 255, 0.25); /* Cor para o SVG inline */
     margin-right: 12px;
     display: flex;
     align-items: center;
@@ -101,7 +103,7 @@ nav a.nav-link.active {
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.3);
 }
-.account-trigger .avatar svg {
+.account-trigger .avatar svg { /* SVG do avatar */
     width: 24px;
     height: 24px;
     fill: #fff;
@@ -118,22 +120,22 @@ nav a.nav-link.active {
     color: #fff;
 }
 
-.arrow-icon {
+.arrow-icon { /* Container da seta no trigger */
     transition: transform 0.3s ease;
     display: flex;
     align-items: center;
     margin-left: auto;
 }
-.arrow-icon svg {
+.arrow-icon svg { /* SVG da seta */
     width: 20px;
     height: 20px;
     fill: #fff;
 }
-
-.arrow-icon.open {
+.arrow-icon.open { /* Rotação da seta quando o menu está aberto */
     transform: rotate(180deg);
 }
 
+/* Conteúdo do Menu Dropdown da Conta */
 .account-menu-content {
     display: none;
     position: absolute;
@@ -197,7 +199,6 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* margin-bottom: 25px; */
   flex-wrap: wrap;
   padding-bottom: 20px;
   border-bottom: 1px solid #e0e0e0;
@@ -209,6 +210,7 @@ main {
   font-weight: 600;
 }
 
+/* Secção de Upload */
 .upload-section {
   display: flex;
   align-items: center;
@@ -259,16 +261,16 @@ main {
     fill: white;
 }
 
-/* --- ESTILOS PARA A TABELA DE FICHEIROS --- */
+/* --- ESTILOS PARA A TABELA DE FICHEIROS (Aplicável a index.html e lixeira.html) --- */
 .file-table {
   width: 100%;
   border-collapse: collapse;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; 
   font-size: 14px;
-  table-layout: fixed;
+  table-layout: fixed; /* Essencial para o truncamento e larguras de coluna */
 }
 
 .file-table thead tr {
@@ -276,12 +278,23 @@ main {
   border-bottom: 2px solid #e9ecef;
 }
 
-.file-table th, .file-table td {
+.file-table th {
   text-align: left;
   padding: 12px 15px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  white-space: nowrap; 
+}
+
+.file-table td {
+  text-align: left;
+  padding: 12px 15px; 
   border-bottom: 1px solid #e9ecef;
   color: #495057;
-  vertical-align: middle;
+  vertical-align: middle; 
 }
 
 .file-table tbody tr:last-child td {
@@ -292,13 +305,8 @@ main {
   background-color: #f1f3f4;
 }
 
-/* Larguras das Colunas */
-.file-table-th-select,
-.file-table-td-select {
-  width: 3%;
-  text-align: center;
-}
-
+/* Larguras das Colunas (Ajuste as percentagens conforme necessário) */
+/* Larguras das Colunas (Ajuste as percentagens conforme necessário) */
 .file-table-th-name,
 .file-table-td-name {
   width: 35%;
@@ -306,50 +314,74 @@ main {
 
 .file-table-th-type,
 .file-table-td-type {
-  width: 12%;
+  width: 7%;
 }
 
 .file-table-th-size,
 .file-table-td-size {
-  width: 12%;
+  width: 10%;
 }
 
 .file-table-th-modified,
 .file-table-td-modified {
-  width: 12%;
+  width: 10%;
 }
 
 .file-table-th-actions,
 .file-table-td-actions {
-  width: 20%;
-  text-align: right;
-  white-space: nowrap;
+  width: 15%;
+  text-align: right; 
+  white-space: nowrap; 
 }
 
+/* Estilo para a célula do nome do ficheiro e truncamento */
 .file-table-td-name .filename-wrapper {
   display: flex;
   align-items: center;
 }
 
+.file-icon { 
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  vertical-align: middle; 
+}
+.icon-doc {
+  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_document_x16.png');
+}
+.icon-img {
+  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_image_x16.png');
+}
+.icon-pdf {
+  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_3_pdf_x16.png');
+}
+.icon-file-alt {
+  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_generic_x16.png');
+}
+
+/* Elemento que contém o nome do ficheiro (o link ou o span) */
 .file-table-td-name .filename-wrapper .file-view-link,
 .file-table-td-name .filename-wrapper span.filename-text {
-  display: block; /* Ou inline-block */
-  /* width: 100%; Não é necessário se o pai .filename-wrapper for flex e este for o item flexível */
-  flex-grow: 1; /* Permite que este elemento ocupe o espaço restante */
-  min-width: 0; /* IMPORTANTE para flex items com overflow:hidden e text-overflow:ellipsis */
+  display: block; 
+  flex-grow: 1; 
+  min-width: 0; /* Crucial para text-overflow em flex items */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #007bff;
+  color: #007bff; 
   text-decoration: none;
-  vertical-align: middle; /* Para alinhar com o ícone */
+  vertical-align: middle; 
 }
 .file-table-td-name .filename-wrapper .file-view-link:hover {
   text-decoration: underline;
   color: #0056b3;
 }
 .file-table-td-name .filename-wrapper span.filename-text {
-    color: #495057;
+    color: #495057; 
 }
 
 .empty-table-message {
@@ -360,80 +392,83 @@ main {
 
 /* Botões de Ação na Tabela */
 .action-form {
-    display: inline-block;
-    margin: 0;
-    vertical-align: middle;
+    display: inline-block; 
+    margin: 0; 
+    vertical-align: middle; 
 }
 
 .file-table-td-actions .action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 10px;
-  margin-left: 5px;
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1.3;
-  white-space: nowrap;
-  vertical-align: middle; /* Adicionado para melhor alinhamento entre botões */
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+    padding: 6px 10px; 
+    margin-left: 5px; 
+    font-size: 12px; 
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid transparent; 
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.3; 
+    white-space: nowrap;
+    vertical-align: middle; 
 }
 .file-table-td-actions .action-btn:first-child {
-    margin-left: 0;
+    margin-left: 0; 
 }
 
 .action-btn .action-icon {
-    width: 14px;
+    width: 14px; 
     height: 14px;
-    margin-right: 5px;
-    fill: currentColor;
+    margin-right: 5px; 
+    fill: currentColor; 
 }
 
-.download-btn { background-color: #1a73e8; color: white; }
-.download-btn:hover { background-color: #1765c7; }
-.delete-btn { background-color: #fa8072; color: white; } /* Mover para lixeira (index.html) */
-.delete-btn:hover { background-color: #f08080; }
-
-.delete-select-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  margin-left: 5px;
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  line-height: 1.3;
-  white-space: nowrap;
-  vertical-align: middle;
-  color: white;
-  background-color: #fc3a3a;
-  border: 1px solid transparent;
-  border-radius: 4px;
+/* Cores dos Botões de Ação */
+.download-btn {
+    background-color: #1a73e8;
+    color: white;
+}
+.download-btn:hover {
+    background-color: #1765c7;
 }
 
-.bulk-actions-toolbar {
-  display: none; 
-  text-align: right;
-  padding: 10px 0; /* Espaçamento para a barra de ferramentas */
-  border-bottom: 1px solid #e9ecef; /* Linha separadora opcional */
+.delete-btn { /* Mover para lixeira (index.html) */
+    background-color: #fa8072; 
+    color: white;
+}
+.delete-btn:hover {
+    background-color: #f08080; 
 }
 
-/* Ajustes para checkboxes da tabela */
-.file-table input[type="checkbox"] {
-  cursor: pointer;
-  width: 16px; /* Tamanho da checkbox */
-  height: 16px;
-  vertical-align: middle;
+.lixeira-table-actions .restore-btn {
+    background-color: #5cb85c; 
+    color: white;
 }
+.lixeira-table-actions .restore-btn:hover:not(:disabled) {
+    background-color: #449d44;
+}
+
+.lixeira-table-actions .perm-delete-btn { 
+    background-color: #d9534f; 
+    color: white;
+}
+.lixeira-table-actions .perm-delete-btn:hover:not(:disabled) {
+    background-color: #c9302c;
+}
+
+.action-btn:disabled {
+    background-color: #e9ecef !important;
+    color: #adb5bd !important;
+    border-color: #dee2e6 !important; 
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.action-btn:disabled .action-icon {
+    fill: #adb5bd !important;
+}
+
 /* --- FIM DOS ESTILOS PARA A TABELA DE FICHEIROS --- */
 
 /* --- ESTILOS PARA POPUPS/TOAST NOTIFICATIONS --- */
@@ -493,26 +528,3 @@ main {
     100% { transform: rotate(360deg); }
 }
 .loading-spinner-overlay p { font-size: 1em; color: #555; font-weight: 500; }
-
-/* Ícones de Tipo de Ficheiro na Tabela */
-.file-icon { /* Ícone ao lado do nome do ficheiro */
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-  flex-shrink: 0;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-}
-.icon-doc {
-  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_document_x16.png');
-}
-.icon-img {
-  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_image_x16.png');
-}
-.icon-pdf {
-  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_3_pdf_x16.png');
-}
-.icon-file-alt {
-  background-image: url('https://ssl.gstatic.com/docs/docos/images/tresos/icon_1_generic_x16.png');
-}

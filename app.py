@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 from google.cloud import storage
 import uuid
 from sqlalchemy.sql import text
-from datetime import timedelta
+from datetime import datetime, timedelta
+import mimetypes
+from google.oauth2 import service_account
 
 load_dotenv()
 
@@ -29,8 +31,10 @@ DB_PORT = os.environ.get('DB_PORT')
 
 IS_RUNNING_ON_CLOUD_RUN = os.environ.get('K_SERVICE') is not None
 
+# SERVICE_ACCOUNT_EMAIL = os.environ.get('CLOUD_RUN_SERVICE_ACCOUNT_EMAIL', f"{os.environ.get('GCP_PROJECT_NUMBER', '842663801046')}-compute@developer.gserviceaccount.com")
+
 if IS_RUNNING_ON_CLOUD_RUN:
-    # Configuração para Cloud Run (usando Unix Socket)
+    # Configuração para Cloud Run
     if not all([DB_USER, DB_PASSWORD, DB_NAME, INSTANCE_CONNECTION_NAME]):
         raise ValueError("Variáveis de ambiente do banco de dados incompletas para Cloud Run (DB_USER, DB_PASSWORD, DB_NAME, INSTANCE_CONNECTION_NAME).")
     
@@ -38,7 +42,7 @@ if IS_RUNNING_ON_CLOUD_RUN:
     db_uri = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?host={unix_socket_path}"
     print(f"APP.PY: A usar conexão Cloud SQL via Unix socket: {unix_socket_path}")
 else:
-    # Configuração para Desenvolvimento Local (usando TCP Host/Port via Proxy)
+    # Configuração para Desenvolvimento Local
     if not all([DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT]):
         raise ValueError("Variáveis de ambiente do banco de dados incompletas para desenvolvimento local (DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT).")
 
@@ -59,7 +63,6 @@ def inject_global_vars():
 # Outras variáveis que você usa e obtém de os.environ (como GCP_PROJECT_ID) devem ser obtidas da mesma forma.
 GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
 if not GCP_PROJECT_ID and IS_RUNNING_ON_CLOUD_RUN: # Pode ser necessário no Cloud Run para o storage client
-     # Se não estiver definido, tenta obter do metadata server (comum em ambientes GCP)
     try:
         import requests
         metadata_server_url = "http://metadata.google.internal/computeMetadata/v1/project/project-id"
@@ -81,7 +84,7 @@ login_manager.login_view = 'login_page'  # Nome da sua função de rota de login
 login_manager.login_message = "Por favor, faça login para aceder a esta página." # Mensagem opcional
 login_manager.login_message_category = "info" # Categoria da mensagem flash (opcional)
 
-# --- Modelos do Banco de Dados ---
+# --- Modelos da BD ---
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -115,68 +118,46 @@ def format_file_size(size_bytes):
     return "%s %s" % (s.rstrip('0').rstrip('.'), size_name[i])
 
 def get_file_type_from_name(filename):
-    if '.' not in filename:
-        return "Desconhecido"
+    if '.' not in filename: return "Desconhecido"
     ext = filename.rsplit('.', 1)[1].lower()
-    if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']:
-        return "Imagem"
-    elif ext in ['doc', 'docx', 'odt', 'rtf']:
-        return "Documento Word"
-    elif ext == 'pdf':
-        return "PDF"
-    elif ext in ['xls', 'xlsx', 'ods', 'csv']:
-        return "Folha de Cálculo"
-    elif ext in ['ppt', 'pptx', 'odp']:
-        return "Apresentação"
-    elif ext in ['txt', 'md', 'log']:
-        return "Texto"
-    elif ext in ['zip', 'rar', 'tar', 'gz']:
-        return "Comprimido"
-    else:
-        return ext.upper()
+    if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']: return "Imagem"
+    elif ext in ['doc', 'docx', 'odt', 'rtf']: return "Documento Word"
+    elif ext == 'pdf': return "PDF"
+    # ... (outros tipos)
+    else: return ext.upper()
 
-# --- Rotas ---
+
+# ------------------------------------ Rotas ------------------------------------ #
 @app.route('/')
 @login_required
 def home():
+    # ... (sua lógica home existente)
     files_data = []
     if current_user.gcs_bucket_name:
         try:
-            project_id = os.environ.get('GCP_PROJECT_ID', 'airy-bit-460116-k8')
-            storage_client = storage.Client(project=project_id)
-            blobs = storage_client.list_blobs(current_user.gcs_bucket_name)
-            
-            for blob in blobs:
-                if blob.name.startswith(TRASH_PREFIX):
-                    continue
-
+            storage_client = storage.Client(project=GCP_PROJECT_ID)
+            all_blobs_iterator = storage_client.list_blobs(current_user.gcs_bucket_name)
+            all_blobs_list = list(all_blobs_iterator)
+            active_blobs = [blob for blob in all_blobs_list if not blob.name.startswith(TRASH_PREFIX)]
+            def get_blob_updated_time(blob):
+                return blob.updated if blob.updated is not None else datetime.min
+            sorted_blobs = sorted(active_blobs, key=get_blob_updated_time, reverse=True)
+            for blob in sorted_blobs:
+                # ... (construir files_data)
                 updated_date = blob.updated.strftime('%H:%M %d-%m-%Y') if blob.updated else "N/A"
                 file_type = get_file_type_from_name(blob.name)
-
-                icon_class = 'icon-file-alt'
-                if file_type == "PDF":
-                    icon_class = 'icon-pdf'
-                elif file_type == "Imagem":
-                    icon_class = 'icon-img'
-                elif file_type in ["Documento Word", "Texto"]:
-                    icon_class = 'icon-doc'
-                # Adicione mais elif para outros tipos e ícones específicos
-                # elif file_type == "Folha de Cálculo":
-                #     icon_class = 'icon-excel' # Exemplo
-                # elif file_type == "Comprimido":
-                #     icon_class = 'icon-zip' # Exemplo
-
+                icon_class = 'icon-file-alt' 
+                if file_type == "PDF": icon_class = 'icon-pdf'
+                elif file_type == "Imagem": icon_class = 'icon-img'
+                elif file_type in ["Documento Word", "Texto"]: icon_class = 'icon-doc'
                 files_data.append({
-                    'name': blob.name,
-                    'type': file_type,
-                    'size': format_file_size(blob.size),
-                    'modified': updated_date,
+                    'name': blob.name, 'type': file_type, 
+                    'size': format_file_size(blob.size), 'modified': updated_date,
                     'icon_class': icon_class
                 })
-            print(f"Ficheiros encontrados para {current_user.email}: {len(files_data)}")
         except Exception as e:
-            print(f"Erro ao listar ficheiros do bucket {current_user.gcs_bucket_name}: {e}")
-    
+            print(f"Erro ao listar ficheiros: {e}")
+            flash(f"Não foi possível carregar os ficheiros: {str(e)}", "danger")
     return render_template('index.html', files=files_data)
 
 
@@ -201,9 +182,8 @@ def login_page():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
-            login_user(user) # Função do Flask-Login para iniciar a sessão
+            login_user(user)
             print(f"Login bem-sucedido para: {email}, sessão iniciada.")
-            # O frontend JavaScript ainda pode usar este redirect
             return jsonify({"message": "Login bem-sucedido!", "redirect": url_for('home')}), 200
         else:
             print(f"Falha no login para: {email}")
@@ -293,77 +273,121 @@ def register_page():
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "Nenhum ficheiro enviado"}), 400
+    if 'file' not in request.files or request.files['file'].filename == '':
+        return jsonify({"error": "Nenhum ficheiro selecionado"}), 400
     
     file_to_upload = request.files['file']
-
-    if file_to_upload.filename == '':
-        return jsonify({"error": "Nenhum ficheiro selecionado"}), 400
-
-    if file_to_upload and current_user.gcs_bucket_name:
-        try:
-            # É uma boa prática usar secure_filename para evitar nomes de ficheiro maliciosos
-            filename = secure_filename(file_to_upload.filename)
-            
-            project_id = os.environ.get('GCP_PROJECT_ID', 'airy-bit-460116-k8') # Obtenha do .env ou defina diretamente
-            storage_client = storage.Client(project=project_id)
-            bucket = storage_client.bucket(current_user.gcs_bucket_name)
-            blob = bucket.blob(filename) # O nome do ficheiro no GCS será o mesmo que o original
-
-            # Pode querer definir o tipo de conteúdo para melhor visualização/download no GCS
-            # blob.content_type = file_to_upload.content_type 
-
-            blob.upload_from_file(file_to_upload.stream) # Use .stream para eficiência
-
-            print(f"Ficheiro {filename} enviado para o bucket {current_user.gcs_bucket_name} por {current_user.email}")
-            return jsonify({"message": f"Ficheiro '{filename}' enviado com sucesso!"}), 200
+    if not current_user.gcs_bucket_name:
+        return jsonify({"error": "Utilizador não tem bucket configurado."}), 400
         
-        except Exception as e:
-            print(f"Erro ao enviar ficheiro para GCS: {e}")
-            return jsonify({"error": "Ocorreu um erro no servidor ao tentar enviar o ficheiro."}), 500
-    else:
-        if not current_user.gcs_bucket_name:
-            return jsonify({"error": "Utilizador não tem um bucket GCS configurado."}), 400
-        return jsonify({"error": "Erro desconhecido no upload."}), 500
+    try:
+        filename = secure_filename(file_to_upload.filename)
+        if not GCP_PROJECT_ID:
+            raise ValueError("GCP_PROJECT_ID não está configurado no ambiente.")
+
+        storage_client = storage.Client(project=GCP_PROJECT_ID)
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+        blob = bucket.blob(filename)
+
+        # Determinar e definir o Content-Type do blob ANTES do upload
+        mimetype, _ = mimetypes.guess_type(filename)
+        if mimetype:
+            blob.content_type = mimetype
+            print(f"UPLOAD: Definindo Content-Type para '{filename}' como '{mimetype}'")
+        else:
+            blob.content_type = 'application/octet-stream' # Fallback
+            print(f"UPLOAD: Não foi possível adivinhar o Content-Type para '{filename}', usando 'application/octet-stream'")
+
+        blob.upload_from_file(file_to_upload.stream)
+        print(f"Ficheiro {filename} enviado para o bucket {current_user.gcs_bucket_name} por {current_user.email} com Content-Type: {blob.content_type}")
+        return jsonify({"message": f"Ficheiro '{filename}' enviado com sucesso!"}), 200
+    
+    except Exception as e:
+        print(f"Erro ao enviar ficheiro para GCS: {e}")
+        return jsonify({"error": "Ocorreu um erro no servidor ao tentar enviar o ficheiro."}), 500
     
     
 @app.route('/download/<path:filename>')
 @login_required
 def download_file(filename):
     if not current_user.gcs_bucket_name:
-        # flash("Utilizador não tem um bucket configurado.", "danger") # Exemplo com flash messages
-        return "Erro: Bucket não configurado para este utilizador.", 400
+        flash("Bucket não configurado para este utilizador.", "danger")
+        return redirect(url_for('home'))
+    
+    safe_filename_display = secure_filename(filename)
 
     try:
-        project_id = os.environ.get('GCP_PROJECT_ID', 'airy-bit-460116-k8') # Confirme seu project_id
-        storage_client = storage.Client(project=project_id)
+        # Caminho para o ficheiro da chave que descarregou
+        key_path = "service-account-key.json"
+        
+        # Criar credenciais explicitamente a partir do ficheiro da chave
+        # Estas credenciais CONTÊM a chave privada necessária para assinar.
+        signing_credentials = service_account.Credentials.from_service_account_file(key_path)
+
+        # Inicializar o cliente do Storage com estas credenciais específicas
+        storage_client = storage.Client(project=GCP_PROJECT_ID, credentials=signing_credentials)
+        
         bucket = storage_client.bucket(current_user.gcs_bucket_name)
         blob = bucket.blob(filename)
 
         if not blob.exists():
-            # flash(f"O ficheiro '{filename}' não foi encontrado.", "warning")
-            return "Ficheiro não encontrado no seu armazenamento.", 404
+            flash(f"O ficheiro '{safe_filename_display}' não foi encontrado.", "warning")
+            return redirect(url_for('home'))
 
-        # Gerar uma URL assinada V4 para o blob.
-        # A URL expira após 15 minutos (pode ajustar).
-        # O método é GET, pois queremos descarregar o ficheiro.
+        # AGORA a assinatura vai usar a chave privada do ficheiro.
+        # Já não precisamos do parâmetro service_account_email.
         signed_url = blob.generate_signed_url(
             version="v4",
-            expiration=timedelta(minutes=15), # O ficheiro pode ser descarregado durante os próximos 15 minutos
+            expiration=timedelta(minutes=15),
             method="GET",
-            response_disposition=f"attachment; filename={filename}" # Sugere ao navegador para descarregar com este nome
+            response_disposition=f"attachment; filename=\"{safe_filename_display}\""
         )
-        
-        print(f"A gerar URL assinada para download de {filename} do bucket {current_user.gcs_bucket_name}")
-        # Redireciona o navegador para a URL assinada, o que iniciará o download
         return redirect(signed_url)
-
+        
     except Exception as e:
-        print(f"Erro ao gerar URL assinada para download de {filename}: {e}")
-        # flash("Erro ao tentar descarregar o ficheiro. Tente novamente.", "danger")
-        return "Erro ao processar o pedido de download.", 500
+        print(f"DOWNLOAD (com chave): ERRO ao gerar URL assinada para '{filename}': {e}")
+        flash(f"Erro ao tentar descarregar o ficheiro '{safe_filename_display}'. Detalhes: {str(e)[:100]}...", "danger")
+        return redirect(url_for('home'))
+
+
+@app.route('/view/<path:filename>')
+@login_required
+def view_file(filename):
+    if not current_user.gcs_bucket_name:
+        flash("Bucket não configurado para este utilizador.", "danger")
+        return redirect(url_for('home'))
+
+    safe_filename_display = secure_filename(filename)
+
+    try:
+        key_path = "service-account-key.json"
+        signing_credentials = service_account.Credentials.from_service_account_file(key_path)
+        storage_client = storage.Client(project=GCP_PROJECT_ID, credentials=signing_credentials)
+        
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+        blob = bucket.blob(filename)
+
+        if not blob.exists():
+            flash(f"O ficheiro '{safe_filename_display}' não foi encontrado.", "warning")
+            return redirect(url_for('home'))
+        
+        blob_content_type_for_response = blob.content_type or 'application/octet-stream'
+
+        signed_url = blob.generate_signed_url(
+            version="v4",
+            expiration=timedelta(minutes=15),
+            method="GET",
+            response_disposition='inline',
+            response_content_type=blob_content_type_for_response
+        )
+        return redirect(signed_url)
+        
+    except Exception as e:
+        print(f"VIEW (com chave): ERRO ao gerar URL assinada para '{filename}': {e}")
+        flash(f"Erro ao tentar visualizar o ficheiro '{safe_filename_display}'. Detalhes: {str(e)[:100]}...", "danger")
+        return redirect(url_for('home'))
     
+
 # --- Rotas da Lixeira ---
 @app.route('/lixeira')
 @login_required
@@ -395,7 +419,6 @@ def lixeira_page():
             print(f"Erro ao listar ficheiros da lixeira: {e}")
             flash(f"Não foi possível carregar a lixeira: {str(e)}", "danger")
     return render_template('lixeira.html', trashed_files=trashed_files_data)
-
 
 @app.route('/move_to_trash/<path:filename>', methods=['POST'])
 @login_required
@@ -436,6 +459,82 @@ def move_to_trash(filename):
     return redirect(url_for('home'))
 
 
+@app.route('/bulk_move_to_trash', methods=['POST'])
+@login_required
+def bulk_move_to_trash():
+    if not current_user.gcs_bucket_name:
+        return jsonify({"error": "Utilizador não tem um bucket configurado."}), 400
+
+    data = request.get_json()
+    filenames_to_move = data.get('filenames')
+
+    if not filenames_to_move or not isinstance(filenames_to_move, list):
+        return jsonify({"error": "Nenhuma lista de ficheiros fornecida ou formato inválido."}), 400
+
+    if not GCP_PROJECT_ID: # Garante que GCP_PROJECT_ID está disponível
+        print("ERRO FATAL: GCP_PROJECT_ID não definido no ambiente.")
+        return jsonify({"error": "Configuração do servidor incompleta."}), 500
+
+    moved_count = 0
+    errors = []
+
+    try:
+        storage_client = storage.Client(project=GCP_PROJECT_ID)
+        bucket = storage_client.bucket(current_user.gcs_bucket_name)
+
+        for filename_to_move in filenames_to_move:
+            if not filename_to_move: # Ignora strings vazias na lista
+                continue
+
+            safe_filename = secure_filename(filename_to_move) # Limpa o nome do ficheiro
+            source_blob = bucket.blob(safe_filename)
+
+            if not source_blob.exists():
+                errors.append(f"Ficheiro '{safe_filename}' não encontrado.")
+                print(f"Tentativa de mover para lixeira ficheiro inexistente: {safe_filename}")
+                continue
+
+            # Lógica para evitar sobrescrever na lixeira (adiciona sufixo numérico)
+            destination_blob_name_base = safe_filename.lstrip('/')
+            destination_blob_name = TRASH_PREFIX + destination_blob_name_base
+            
+            counter = 1
+            temp_dest_name = destination_blob_name
+            original_name_part_for_rename, ext_part_for_rename = os.path.splitext(destination_blob_name_base)
+
+            while bucket.blob(temp_dest_name).exists():
+                temp_dest_name = f"{TRASH_PREFIX}{original_name_part_for_rename}({counter}){ext_part_for_rename}"
+                counter += 1
+            destination_blob_name = temp_dest_name
+            
+            try:
+                new_blob = bucket.copy_blob(source_blob, bucket, destination_blob_name)
+                if new_blob.exists():
+                    source_blob.delete()
+                    moved_count += 1
+                    print(f"Ficheiro '{safe_filename}' movido para '{destination_blob_name}'")
+                else:
+                    errors.append(f"Falha ao copiar '{safe_filename}' para a lixeira.")
+            except Exception as e_file:
+                error_msg = f"Erro ao mover '{safe_filename}': {str(e_file)[:100]}..."
+                errors.append(error_msg)
+                print(error_msg)
+        
+        if moved_count > 0 and not errors:
+            return jsonify({"message": f"{moved_count} ficheiro(s) movido(s) para a lixeira com sucesso."}), 200
+        elif moved_count > 0 and errors:
+            return jsonify({"message": f"{moved_count} ficheiro(s) movido(s), mas ocorreram erros com outros: {'; '.join(errors)}."}), 207 # Multi-Status
+        elif errors:
+            return jsonify({"error": f"Não foi possível mover os ficheiros selecionados. Erros: {'; '.join(errors)}"}), 400
+        else:
+            return jsonify({"message": "Nenhum ficheiro foi movido (podem não ter sido encontrados ou já estavam na lixeira)."}), 200
+
+
+    except Exception as e:
+        print(f"Erro geral ao mover ficheiros em massa para a lixeira: {e}")
+        return jsonify({"error": f"Erro geral no servidor: {str(e)[:100]}..."}), 500
+
+
 @app.route('/delete_permanently_from_trash/<path:full_trash_filename>', methods=['POST'])
 @login_required
 def delete_permanently_from_trash_route(full_trash_filename): # Nome da função alterado
@@ -461,7 +560,6 @@ def delete_permanently_from_trash_route(full_trash_filename): # Nome da função
     return redirect(url_for('lixeira_page'))
 
 
-# NOVA ROTA PARA RESTAURAR FICHEIROS DA LIXEIRA
 @app.route('/restore_from_trash/<path:full_trash_filename>', methods=['POST'])
 @login_required
 def restore_from_trash_route(full_trash_filename):
@@ -515,6 +613,7 @@ def restore_from_trash_route(full_trash_filename):
         flash(f"Erro ao restaurar ficheiro: {str(e)}", "danger")
     
     return redirect(url_for('lixeira_page'))
+
 # ------------------------------ UTILIZAÇÃO APENAS EM DEVELOPMENT ------------------------------ #
 
 # Rota de Depuração Temporária
